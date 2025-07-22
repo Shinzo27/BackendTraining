@@ -1,47 +1,32 @@
 import express from "express";
-import fs from "fs";
+import { getProducts, writeProducts } from './Services/Products.js'
 
 const app = express();
 const PORT = 8000;
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   return res.json({
     message: "Server is healthy.",
+    products: products,
   });
 });
 
 app.get("/getProducts", async (req, res) => {
-  let products;
-  await fs.readFile("./products.json", "utf8", (err, data) => {
-    if (err) return err;
-    console.log(data);
-    products = JSON.parse(data);
-    return res.json({
-      status: 200,
-      products: products,
-    });
+  const products = await getProducts();
+  return res.json({
+    products: products,
   });
 });
 
 app.post("/addProduct", async (req, res) => {
   const body = req.body;
-  let products;
-  await fs.readFile("./products.json", "utf8", async (err, data) => {
-    if (err) return err;
 
-    products = JSON.parse(data);
+  const products = await getProducts();
+  products.push(body);
 
-    products.push(body);
-
-    await fs.writeFile("./products.json", JSON.stringify(products), (err) => {
-      if (err)
-        return res.status(500).json({
-          message: "Something went wrong",
-        });
-    });
-  });
+  writeProducts(products);
 
   return res.json({
     status: 200,
@@ -52,69 +37,47 @@ app.post("/addProduct", async (req, res) => {
 app.put("/editProduct/:id", async (req, res) => {
   const { id } = req.params;
   const body = req.body;
-  let products;
-  await fs.readFile("./products.json", "utf8", async (err, data) => {
-    if (err)
-      return res.status(500).json({
-        message: "Something went wrong",
-      });
-    products = JSON.parse(data);
-    console.log(products);
-    const index = products.findIndex((t) => t.id === Number(id));
-    console.log(index);
-    if (index === -1)
-      return res.json({
-        status: 500,
-        message: "Product not found!",
-      });
-    products[index] = { ...products[index], ...body };
 
-    console.log(products);
-    await fs.writeFile("./products.json", JSON.stringify(products), (err) => {
-      if (err)
-        return res.status(500).json({
-          message: "Something went wrong",
-        });
-    });
+  const products = await getProducts();
+
+  const index = products.findIndex((t) => t.id === Number(id));
+
+  if (index === -1)
     return res.json({
-      status: 200,
-      message: "Product Edited Successfully!",
+      status: 500,
+      message: "Product not found!",
     });
+  products[index] = { ...products[index], ...body };
+
+  await writeProducts(products);
+
+  return res.json({
+    message: "Product edited successfully!",
   });
 });
 
 app.delete("/deleteProduct/:id", async (req, res) => {
   const { id } = req.params;
-  let products;
-  
-  await fs.readFile("./products.json", "utf8", async(err, data) => {
-    if (err)
-      return res.status(500).json({
-        message: "Something went wrong",
-      });
-    products = JSON.parse(data);
 
-    const index = products.findIndex((t) => t.id === Number(id));
+  const products = await getProducts();
 
-    if (index === -1)
-      return res.json({
-        status: 500,
-        message: "Product Not Found!",
-      });
+  const index = products.findIndex((t) => t.id === Number(id));
 
-    products.splice(index, 1);
-    
-    await fs.writeFile("./products.json", JSON.stringify(products), (err) => {
-      if (err)
-        return res.status(500).json({
-          message: "Something went wrong",
-        });
-    });
-
+  if (index === -1)
     return res.json({
-      status: 200,
-      message: "Product Deleted Successfully!",
+      status: 500,
+      message: "Product Not Found!",
     });
+
+  products.splice(index, 1);
+
+  console.log(products);
+
+  await writeProducts(products);
+
+  return res.json({
+    status: 200,
+    message: "Product Deleted Successfully!",
   });
 });
 
