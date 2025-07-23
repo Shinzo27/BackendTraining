@@ -3,10 +3,8 @@ import User from '../Models/User.Model.js';
 
 export async function auth(req, res, next) {
     const userCookie = req.cookies.user
-    console.log(userCookie);
     if(userCookie) {
         const payload = jwt.decode(userCookie, process.env.JWT_SECRET)
-
         const user = await User.findOne({ email: payload.email })
         req.user = user
         return next()
