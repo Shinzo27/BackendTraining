@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import bookRouter from "./Routes/Books.Route.js";
 import mongoose from "mongoose";
 import cors from 'cors'
+import { migration } from "./Scripts/Migration.js";
 
 const app = express();
 dotenv.config();
@@ -24,6 +25,8 @@ app.get("/", (req, res) => {
     message: "Server is healthy!",
   });
 });
+
+migration()
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port: " + process.env.PORT);

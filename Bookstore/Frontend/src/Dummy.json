@@ -600,5 +600,47 @@
       "bookPrice": 541,
       "releasedYear": 2008
     }
+  ],
+  "users": [
+    {
+      "email": "liam.garcia@x.dummyjson.com",
+      "password": "liamgpass"
+    },
+    {
+      "email": "mia.rodriguez@x.dummyjson.com",
+      "password": "miarpass"
+    },
+    {
+      "email": "noah.hernandez@x.dummyjson.com",
+      "password": "noahhpass"
+    },
+    {
+      "email": "charlotte.lopez@x.dummyjson.com",
+      "password": "charlottempass"
+    },
+    {
+      "email": "william.gonzalez@x.dummyjson.com",
+      "password": "williamgpass"
+    },
+    {
+      "email": "avery.perez@x.dummyjson.com",
+      "password": "averyppass"
+    },
+    {
+      "email": "evelyn.sanchez@x.dummyjson.com",
+      "password": "evelynspass"
+    },
+    {
+      "email": "logan.torres@x.dummyjson.com",
+      "password": "logantpass"
+    },
+    {
+      "email": "abigail.rivera@x.dummyjson.com",
+      "password": "abigailrpass"
+    },
+    {
+      "email": "jackson.evans@x.dummyjson.com",
+      "password": "jacksonepass"
+    } 
   ]
 }
