@@ -1,0 +1,23 @@
+{
+  "name": "salesdata",
+  "version": "1.0.0",
+  "description": "Task: Using a dataset of orders, products, and customers collections: -- Calculate total sales per customer. -- Identify top 3 products by revenue. -- Generate a report showing monthly sales trend for the last 12 months. -- Show orders where total quantity exceeds average order quantity.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "moment": "^2.30.1",
+    "mongoose": "^8.16.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
