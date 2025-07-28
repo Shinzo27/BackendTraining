@@ -4,6 +4,7 @@ import bookRouter from "./Routes/Books.Route.js";
 import mongoose from "mongoose";
 import cors from 'cors'
 import { migration } from "./Scripts/Migration.js";
+import Books from "./Models/Books.js";
 
 const app = express();
 dotenv.config();
