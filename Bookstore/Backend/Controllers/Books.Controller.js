@@ -98,7 +98,7 @@ export const sortAllBooks = async (req, res) => {
     data: books,
   });
 };
-
+  
 const getBooksByCondition = async (req, res, condition) => {
   const books = await Books.find(condition);
 
