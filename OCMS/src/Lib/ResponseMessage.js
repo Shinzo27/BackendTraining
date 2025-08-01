@@ -4,7 +4,6 @@ export const RESPONSE_MESSAGE = {
     FETCHED: "User fetched successfully!",
     DELETED: "User deleted successfully!",
     UPDATED: "User updated successfully!",
-    ALREADY_EXISTS: "Student is already enrolled in this course",
   },
   ERROR: {
     NOT_FOUND: "Not found!",
@@ -15,11 +14,13 @@ export const RESPONSE_MESSAGE = {
     FETCHED: "Categories fetched successfully!",
     DELETED: "Category deleted successfully!",
     UPDATED: "Category updated successfully!",
+    ALREADY_EXISTS: "Category is already exists",
   },
   ENROLLMENTS: {
     FETCHED: "Enrollment fetched successfully!",
     CREATED: "Enrollment created successfully!",
     DELETED: "Enrollment deleted successfully",
+    ALREADY_EXISTS: "Student is already enrolled in this course",
   },
   COURSE: {
     CREATED: "Course created successfully!",

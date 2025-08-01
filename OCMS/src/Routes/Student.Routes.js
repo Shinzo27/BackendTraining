@@ -9,11 +9,19 @@ import {
 
 const router = Router();
 
-//Student
+//Get Student Route
 router.get("/", getStudents);
+
+// Create Student Route
 router.post("/", createStudent);
+
+// Get Student By Id Route
 router.get("/:id", getStudentById);
+
+// Delete Student Route
 router.delete("/:id", deleteStudent);
+
+// Update Student Route
 router.put("/:id", updateStudent);
 
 export default router;

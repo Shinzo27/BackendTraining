@@ -2,6 +2,7 @@ import { RESPONSE_MESSAGE } from "../Lib/ResponseMessage.js";
 import { postUserSchema, updateUserSchema } from "../Lib/ZodSchema.js";
 import { Course, User } from "../Models/index.js";
 
+//Get Instructor By Id Controller
 export const getInstructorById = async (req, res) => {
   const { id } = req.params;
 
@@ -24,6 +25,7 @@ export const getInstructorById = async (req, res) => {
       });
 };
 
+//List all instructors Controller
 export const getAllInstructors = async (req, res) => {
   const instructors = await User.findAll({
     where: {
@@ -36,6 +38,7 @@ export const getAllInstructors = async (req, res) => {
   });
 };
 
+//Create New Instructor Controller
 export const createInstructor = async (req, res) => {
   try {
     const parsedPayload = postUserSchema.parse(req.body);
@@ -47,11 +50,13 @@ export const createInstructor = async (req, res) => {
       role: "instructor",
     });
 
-    if (instructor) {
-      return res.json({
-        message: RESPONSE_MESSAGE.USER.CREATED,
-      });
-    }
+    return instructor
+      ? res.json({
+          message: RESPONSE_MESSAGE.USER.CREATED,
+        })
+      : res.json({
+          message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+        });
   } catch (error) {
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
@@ -60,6 +65,7 @@ export const createInstructor = async (req, res) => {
   }
 };
 
+//Update Instructor Controller
 export const updateInstructor = async (req, res) => {
   const { id } = req.params;
   const body = req.body;
@@ -103,6 +109,7 @@ export const updateInstructor = async (req, res) => {
   }
 };
 
+//Delete Instructor Controller
 export const deleteInstructor = async (req, res) => {
   const { id } = req.params;
 

@@ -7,8 +7,13 @@ import {
 
 const router = Router();
 
+// Get Enrollments Route
 router.get("/", getEnrollments);
+
+// Create Enrollment Route
 router.post("/", postEnrollments);
+
+// Delete Enrollment Route
 router.delete("/:id", deleteEnrollment);
 
 export default router;

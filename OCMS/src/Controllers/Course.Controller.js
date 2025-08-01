@@ -1,9 +1,10 @@
 import { Op } from "sequelize";
-import { checkCategory, checkUser } from "../Lib/Checks.js";
+import { checkCategory, checkIsCourseValid, checkUser } from "../Lib/Checks.js";
 import { RESPONSE_MESSAGE } from "../Lib/ResponseMessage.js";
 import { createCourseSchema, updateCourseSchema } from "../Lib/ZodSchema.js";
 import { Category, Course, User } from "../Models/index.js";
 
+//Get Course By Id Controller
 export const getCourseById = async (req, res) => {
   const { id } = req.params;
 
@@ -27,26 +28,17 @@ export const getCourseById = async (req, res) => {
       });
 };
 
+//Create New Course Controller
 export const createCourse = async (req, res) => {
   try {
     const parsedPayload = createCourseSchema.parse(req.body);
 
-    const checkUserExists = await checkUser(
-      parsedPayload.instructorId,
-      "instructor"
-    );
+    //Validations if category and instructor exists or not, if title is already exists.
+    const isValid = await checkIsCourseValid(parsedPayload.instructorId, 'instructor', 'id', parsedPayload.categoryId, 'title', parsedPayload.title)
 
-    if (!checkUserExists)
-      return res.json({
-        message: RESPONSE_MESSAGE.ERROR.NOT_FOUND,
-      });
-
-    const checkCategoryExists = await checkCategory(parsedPayload.categoryId);
-
-    if (!checkCategoryExists)
-      return res.json({
-        message: RESPONSE_MESSAGE.ERROR.NOT_FOUND,
-      });
+    if(!isValid) return res.json({
+      message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST
+    })
 
     const course = await Course.create({
       title: parsedPayload.title,
@@ -70,6 +62,7 @@ export const createCourse = async (req, res) => {
   }
 };
 
+//deleteCourse Controller
 export const deleteCourse = async (req, res) => {
   const { id } = req.params;
 
@@ -88,6 +81,7 @@ export const deleteCourse = async (req, res) => {
       });
 };
 
+//updateCourse Controller
 export const updateCourse = async (req, res) => {
   const { id } = req.params;
 
@@ -95,7 +89,7 @@ export const updateCourse = async (req, res) => {
     const parsedPayload = updateCourseSchema.parse(req.body);
 
     const checkCategoryExists = parsedPayload.categoryId
-      ? await checkCategory(parsedPayload.categoryId)
+      ? await checkCategory('id', parsedPayload.categoryId)
       : true;
 
     if (!checkCategoryExists)
@@ -138,6 +132,7 @@ export const updateCourse = async (req, res) => {
   }
 };
 
+//getCourses Controller
 export const getCourses = async (req, res) => {
   try {
     const {

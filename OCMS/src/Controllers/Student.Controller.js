@@ -3,6 +3,7 @@ import { postUserSchema, updateUserSchema } from "../Lib/ZodSchema.js";
 import { Course, Enrollment, User } from "../Models/index.js";
 import { Op } from "sequelize";
 
+//Create Student Controller
 export const createStudent = async (req, res) => {
   try {
     const parsedPayload = postUserSchema.parse(req.body);
@@ -13,10 +14,14 @@ export const createStudent = async (req, res) => {
       role: "student",
     });
 
-    return res.json({
-      success: true,
-      message: RESPONSE_MESSAGE.USER.CREATED,
-    });
+    return user
+      ? res.json({
+          success: true,
+          message: RESPONSE_MESSAGE.USER.CREATED,
+        })
+      : res.json({
+          message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+        });
   } catch (error) {
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
@@ -25,6 +30,7 @@ export const createStudent = async (req, res) => {
   }
 };
 
+//Get Student Controller
 export const getStudentById = async (req, res) => {
   const { id } = req.params;
 
@@ -52,6 +58,7 @@ export const getStudentById = async (req, res) => {
       });
 };
 
+//Delete Student Controller
 export const deleteStudent = async (req, res) => {
   const { id } = req.params;
 
@@ -72,6 +79,7 @@ export const deleteStudent = async (req, res) => {
       });
 };
 
+// Update Student Controller
 export const updateStudent = async (req, res) => {
   const { id } = req.params;
   const body = req.body;
@@ -113,6 +121,7 @@ export const updateStudent = async (req, res) => {
   }
 };
 
+//Get Student Controller
 export const getStudents = async (req, res) => {
   const search = req.query.search || "";
   const limit = Number(req.query.limit) || 10;

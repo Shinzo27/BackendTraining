@@ -1,7 +1,9 @@
+import { checkCategory } from "../Lib/Checks.js";
 import { RESPONSE_MESSAGE } from "../Lib/ResponseMessage.js";
 import { addCategorySchema, updateCategorySchema } from "../Lib/ZodSchema.js";
 import { Category } from "../Models/index.js";
 
+//Get Categories Controller
 export const getCategories = async (req, res) => {
   const categories = await Category.findAll({});
 
@@ -11,6 +13,7 @@ export const getCategories = async (req, res) => {
   });
 };
 
+//Get Categories By Id Controller
 export const getCategoryById = async (req, res) => {
   const { id } = req.params;
 
@@ -30,21 +33,28 @@ export const getCategoryById = async (req, res) => {
       });
 };
 
+//Create Category Controller
 export const createCategory = async (req, res) => {
   const body = req.body;
 
   try {
     const parsedPayload = addCategorySchema.parse(body);
 
+    const checkCategoryExists = await checkCategory('name', parsedPayload.name)
+
+    if(checkCategoryExists) return res.json({
+      message: RESPONSE_MESSAGE.CATEGORIES.ALREADY_EXISTS
+    })
+
     const category = await Category.create({
       name: parsedPayload.name,
     });
 
-    if (category) {
-      return res.json({
-        message: RESPONSE_MESSAGE.CATEGORIES.CREATED,
-      });
-    }
+    return category ? res.json({
+      message: RESPONSE_MESSAGE.CATEGORIES.CREATED,
+    }) : res.json({
+      message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+    })
   } catch (error) {
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
@@ -53,6 +63,7 @@ export const createCategory = async (req, res) => {
   }
 };
 
+//Update Category Controller
 export const updateCategory = async (req, res) => {
   const body = req.body;
   const { id } = req.params;
@@ -82,6 +93,7 @@ export const updateCategory = async (req, res) => {
   }
 };
 
+//Delete Category Controller
 export const deleteCategory = async (req, res) => {
   const { id } = req.params;
 

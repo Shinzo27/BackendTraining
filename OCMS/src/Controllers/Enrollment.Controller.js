@@ -1,7 +1,8 @@
-import { checkCourse, checkEnrollment, checkUser } from "../Lib/Checks.js";
+import { checkIsEnrollmentValid } from "../Lib/Checks.js";
 import { RESPONSE_MESSAGE } from "../Lib/ResponseMessage.js";
 import { Course, Enrollment, User } from "../Models/index.js";
 
+//Get Enrollments Controller
 export const getEnrollments = async (req, res) => {
   const enrollments = await Enrollment.findAll({
     attributes: ["id", "createdAt", "updatedAt"],
@@ -17,27 +18,15 @@ export const getEnrollments = async (req, res) => {
   });
 };
 
+//Create Enrollment Controller
 export const postEnrollments = async (req, res) => {
   const body = req.body;
 
-  const userExists = await checkUser(body.userId, 'student');
+  //Will check if user exists, course exists and enrollment is not already exists
+  const isValid = await checkIsEnrollmentValid(body.userId, 'student', 'id', body.courseId)
 
-  if (!userExists)
-    return res.json({
-      message: RESPONSE_MESSAGE.ERROR.NOT_FOUND,
-    });
-
-  const courseExists = await checkCourse(body.courseId);
-
-  if (!courseExists)
-    return res.json({
-      message: RESPONSE_MESSAGE.ERROR.NOT_FOUND,
-    });
-
-  const checkEnrollmentExists = await checkEnrollment(body.userId, body.courseId);
-
-  if(checkEnrollmentExists) return res.json({
-    message: RESPONSE_MESSAGE.USER.ALREADY_EXISTS
+  if(!isValid) return res.json({
+    message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST
   })
 
   const enrollment = await Enrollment.create({
@@ -54,6 +43,7 @@ export const postEnrollments = async (req, res) => {
       });
 };
 
+//Delete Enrollment Controller
 export const deleteEnrollment = async (req, res) => {
   const { id } = req.params;
 

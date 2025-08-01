@@ -13,10 +13,15 @@ app.use(express.json());
 
 db.sync();
 
+// Instructor Routes
 app.use("/api/instructors", InstructorRouter)
+// Students Routes
 app.use("/api/students", StudentRouter);
+// Enrollments Routes
 app.use("/api/enrollments", EnrollmentRouter);
+// Courses Routes
 app.use("/api/courses", CourseRouter);
+// Categories Routes
 app.use("/api/category", CategoryRouter);
 
 app.get("/", (req, res) => {
