@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import db from "./Config/db.js";
-import UserRouter from "./Routes/User.Routes.js";
+import StudentRouter from "./Routes/Student.Routes.js";
 import EnrollmentRouter from "./Routes/Enrollment.Routes.js";
 import CourseRouter from "./Routes/Course.Routes.js";
 import CategoryRouter from "./Routes/Category.Routes.js";
@@ -14,7 +14,7 @@ app.use(express.json());
 db.sync();
 
 app.use("/api/instructors", InstructorRouter)
-app.use("/api/users", UserRouter);
+app.use("/api/students", StudentRouter);
 app.use("/api/enrollments", EnrollmentRouter);
 app.use("/api/courses", CourseRouter);
 app.use("/api/category", CategoryRouter);

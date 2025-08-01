@@ -175,21 +175,28 @@ export const getCourses = async (req, res) => {
       if (maxPrice) whereCondition.price[Op.lte] = parseFloat(maxPrice);
     }
 
-    const courses = await Course.findAll({
-      where: whereCondition,
-      offset,
-      limit,
-      order: [[sortBy, order.toUpperCase()]],
-      include: [
-        { model: Category, as: "Category", attributes: ["name"] },
-        { model: User, as: "Instructor", attributes: ["name", "email"] },
-      ],
-    });
+    try {
+      const courses = await Course.findAll({
+        where: whereCondition,
+        limit: Number(limit),
+        offset: Number(offset),
+        order: [[sortBy, order.toUpperCase()]],
+        include: [
+          { model: Category, as: "Category", attributes: ["name"] },
+          { model: User, as: "Instructor", attributes: ["name", "email"] },
+        ],
+      });
 
-    return res.json({
-      message: RESPONSE_MESSAGE.COURSE.FETCHED,
-      courses,
-    });
+      return res.json({
+        message: RESPONSE_MESSAGE.COURSE.FETCHED,
+        courses,
+      });
+    } catch (error) {
+      return res.json({
+        message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+        error,
+      });
+    }
   } catch (error) {
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,

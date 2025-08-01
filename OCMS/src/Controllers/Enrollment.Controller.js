@@ -1,4 +1,4 @@
-import { checkCourse, checkUser } from "../Lib/Checks.js";
+import { checkCourse, checkEnrollment, checkUser } from "../Lib/Checks.js";
 import { RESPONSE_MESSAGE } from "../Lib/ResponseMessage.js";
 import { Course, Enrollment, User } from "../Models/index.js";
 
@@ -33,6 +33,12 @@ export const postEnrollments = async (req, res) => {
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.NOT_FOUND,
     });
+
+  const checkEnrollmentExists = await checkEnrollment(body.userId, body.courseId);
+
+  if(checkEnrollmentExists) return res.json({
+    message: RESPONSE_MESSAGE.USER.ALREADY_EXISTS
+  })
 
   const enrollment = await Enrollment.create({
     studentId: body.userId,

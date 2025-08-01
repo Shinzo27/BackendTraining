@@ -4,6 +4,7 @@ export const RESPONSE_MESSAGE = {
     FETCHED: "User fetched successfully!",
     DELETED: "User deleted successfully!",
     UPDATED: "User updated successfully!",
+    ALREADY_EXISTS: "Student is already enrolled in this course",
   },
   ERROR: {
     NOT_FOUND: "Not found!",

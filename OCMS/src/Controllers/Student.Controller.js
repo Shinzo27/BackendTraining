@@ -3,7 +3,7 @@ import { postUserSchema, updateUserSchema } from "../Lib/ZodSchema.js";
 import { Course, Enrollment, User } from "../Models/index.js";
 import { Op } from "sequelize";
 
-export const createUser = async (req, res) => {
+export const createStudent = async (req, res) => {
   try {
     const parsedPayload = postUserSchema.parse(req.body);
     const user = await User.create({
@@ -113,7 +113,7 @@ export const updateStudent = async (req, res) => {
   }
 };
 
-export const getUsers = async (req, res) => {
+export const getStudents = async (req, res) => {
   const search = req.query.search || "";
   const limit = Number(req.query.limit) || 10;
   const offset = Number(req.query.offset) || 0;

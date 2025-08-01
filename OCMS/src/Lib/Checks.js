@@ -1,4 +1,4 @@
-import { Category, Course, User } from "../Models/index.js"
+import { Category, Course, Enrollment, User } from "../Models/index.js"
 
 export const checkCategory = async(id) => {
     const category = await Category.findByPk(id)
@@ -22,3 +22,14 @@ export const checkCourse = async (id) => {
 
   return checkCourseExists ? true : false;
 };
+
+export const checkEnrollment = async(studentId, courseId) => {
+  const checkEnrollmentExists = await Enrollment.findOne({
+    where: {
+      studentId,
+      courseId
+    }
+  })
+
+  return checkEnrollmentExists ? true : false;
+}

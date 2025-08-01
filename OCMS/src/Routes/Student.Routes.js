@@ -1,17 +1,17 @@
 import { Router } from "express";
 import {
-  createUser,
   getStudentById,
   deleteStudent,
   updateStudent,
-  getUsers,
-} from "../Controllers/User.Controller.js";
+  getStudents,
+  createStudent,
+} from "../Controllers/Student.Controller.js";
 
 const router = Router();
 
 //Student
-router.get("/", getUsers);
-router.post("/", createUser);
+router.get("/", getStudents);
+router.post("/", createStudent);
 router.get("/:id", getStudentById);
 router.delete("/:id", deleteStudent);
 router.put("/:id", updateStudent);
