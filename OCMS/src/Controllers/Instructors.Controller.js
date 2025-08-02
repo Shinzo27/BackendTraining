@@ -58,6 +58,12 @@ export const createInstructor = async (req, res) => {
           message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
         });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.json({
+        message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+        error: error.issues,
+      });
+    }
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
       error: error,

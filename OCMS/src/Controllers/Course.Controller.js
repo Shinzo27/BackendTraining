@@ -34,11 +34,19 @@ export const createCourse = async (req, res) => {
     const parsedPayload = createCourseSchema.parse(req.body);
 
     //Validations if category and instructor exists or not, if title is already exists.
-    const isValid = await checkIsCourseValid(parsedPayload.instructorId, 'instructor', 'id', parsedPayload.categoryId, 'title', parsedPayload.title)
+    const isValid = await checkIsCourseValid(
+      parsedPayload.instructorId,
+      "instructor",
+      "id",
+      parsedPayload.categoryId,
+      "title",
+      parsedPayload.title
+    );
 
-    if(!isValid) return res.json({
-      message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST
-    })
+    if (!isValid)
+      return res.json({
+        message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+      });
 
     const course = await Course.create({
       title: parsedPayload.title,
@@ -55,6 +63,12 @@ export const createCourse = async (req, res) => {
           message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
         });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.json({
+        message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+        error: error.issues,
+      });
+    }
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
       error,
@@ -89,7 +103,7 @@ export const updateCourse = async (req, res) => {
     const parsedPayload = updateCourseSchema.parse(req.body);
 
     const checkCategoryExists = parsedPayload.categoryId
-      ? await checkCategory('id', parsedPayload.categoryId)
+      ? await checkCategory("id", parsedPayload.categoryId)
       : true;
 
     if (!checkCategoryExists)

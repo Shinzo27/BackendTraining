@@ -1,3 +1,4 @@
+import z, { ZodError } from "zod";
 import { checkCategory } from "../Lib/Checks.js";
 import { RESPONSE_MESSAGE } from "../Lib/ResponseMessage.js";
 import { addCategorySchema, updateCategorySchema } from "../Lib/ZodSchema.js";
@@ -56,6 +57,12 @@ export const createCategory = async (req, res) => {
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
     })
   } catch (error) {
+    if(error instanceof z.ZodError){
+      return res.json({
+        message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
+        error: error.issues
+      })
+    }
     return res.json({
       message: RESPONSE_MESSAGE.ERROR.BAD_REQUEST,
       error,
