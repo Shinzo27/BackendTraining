@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  email String
+  password String
+  posts Post[]
+  // userProfile UserProfile?
+
+  // @@id([email, name])
+}
+
+// model UserProfile {
+//   id Int @id @default(autoincrement())
+//   user User @relation(fields: [userEmail, userName], references: [email, name])
+//   userEmail String
+//   userName String
+
+//   @@unique([userEmail, userName])
+// }
+
+model Post {
+  id Int @id @default(autoincrement())
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId Int
+  comments Comments[]
+}
+
+model Comments {
+  id Int @id @default(autoincrement())
+  comment String
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
+}
+
+// Practice
+
+// model Users {
+//   id Int @id @default(autoincrement())
+//   name String
+//   email String
+//   password String
+//   role Role
+//   instructor Course[] @relation("InstructorCourses")
+//   student Enrollment[]
+// }
+
+// model Course {
+//   id Int @id @default(autoincrement())
+//   title String
+//   price Float
+//   categoryId Int
+//   instructorId Int
+//   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   instructor Users @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+//   enrollment Enrollment[]
+// }
+
+// model Enrollment {
+//   id Int @id @default(autoincrement())
+//   studentId Int
+//   courseId Int
+//   EnrolledAt DateTime @default(now())
+//   student Users @relation(fields: [studentId], references: [id], onDelete: Cascade)
+//   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+// }
+
+// model Category {
+//   id Int @id @default(autoincrement())
+//   name String
+//   course Course[]
+// }
+
+// enum Role {
+//   student
+//   instructor
+// }
