@@ -1,1 +1,5 @@
-[{"id":3,"name":"Walnuts","price":300},{"id":5,"title":"Risins","price":660},{"id":1,"title":"Cashew","price":660}]
+[
+  { "id": 3, "name": "Walnuts", "price": 300 },
+  { "id": 5, "title": "Risins", "price": 660 },
+  { "id": 1, "title": "Cashew", "price": 660 }
+]
