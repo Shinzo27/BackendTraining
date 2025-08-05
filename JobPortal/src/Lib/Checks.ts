@@ -43,12 +43,21 @@ export const checkCompanyByJobId = async(id: number, userId: number) => {
   return ( company && company?.company.userId === userId) ? true : false 
 }
 
-export const checkJobId = async(id: number) => {
+export const checkIfValid = async(id: number, userId: number) => {
   const job = await prisma.job.findFirst({
     where: {
       id
     }
   })
 
-  return job ? true : false
+  const ifAlreadyExists = await prisma.application.findFirst({
+    where: {
+      JobId :id,
+      UserId: userId
+    }
+  })
+
+
+
+  return (job && !ifAlreadyExists) ? true : false
 }

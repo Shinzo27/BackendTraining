@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { RESPONSE_MESSAGES } from "../Lib/ResponseMessages";
 import { ZodError } from "zod";
 import { applyJobValidations } from "../Lib/ZodValidations";
-import { checkIfRecruitorIsValid, checkJobId } from "../Lib/Checks";
+import { checkIfRecruitorIsValid, checkIfValid } from "../Lib/Checks";
 import { prisma } from "../Lib/prisma";
 
 export const applyJob = async (req: Request, res: Response) => {
@@ -11,11 +11,11 @@ export const applyJob = async (req: Request, res: Response) => {
 
     const { JobId, coverLetter } = req.body;
 
-    const isValid = await checkJobId(JobId);
+    const isValid = await checkIfValid(JobId, req.user.id);
 
     if (!isValid)
       return res.json({
-        message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.ERROR.APPLICATIONS.ALREADY_EXISTS,
       });
 
     const application = await prisma.application.create({
@@ -48,63 +48,65 @@ export const applyJob = async (req: Request, res: Response) => {
   }
 };
 
-export const getApplicationByUser = async(req: Request, res: Response) => {
-    const userId = req.user.id
+export const getApplicationByUser = async (req: Request, res: Response) => {
+  const userId = req.user.id;
 
-    const applications = await prisma.application.findMany({
-        where: {
-            UserId: userId
+  const applications = await prisma.application.findMany({
+    where: {
+      UserId: userId,
+    },
+    include: {
+      job: {
+        select: {
+          title: true,
         },
-        include: {
-            job: {
-                select: {
-                    title: true
-                }
-            }
-        }
-    })
-
-    return res.json({
-        message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
-        applications
-    })
-}
-
-export const getApplicationsForAJob = async(req: Request, res: Response) => {
-    const userId = req.user.id
-    const { id } = req.params
-
-    const job = await prisma.job.findFirst({
-        where: {
-            id: Number(id)
-        }
-    })
-
-    if(!job) return res.json({
-      message: RESPONSE_MESSAGES.ERROR.NOT_FOUND
-    })
-
-    const isValid = await checkIfRecruitorIsValid(job.companyId, userId)
-
-    if(!isValid) return res.json({
-      message: RESPONSE_MESSAGES.ERROR.UNAUTHORIZED
-    })
-
-    const getApplications = await prisma.application.findMany({
-      where: {
-        JobId: Number(id)
       },
-      include: {
-        job: {
-          select: {
-            title: true
-          }
-        }
-      }
-    })
+    },
+  });
 
+  return res.json({
+    message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
+    applications,
+  });
+};
+
+export const getApplicationsForAJob = async (req: Request, res: Response) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+
+  const job = await prisma.job.findFirst({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!job)
     return res.json({
-      message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
-      applications: getApplications
-    })
-}
+      message: RESPONSE_MESSAGES.ERROR.NOT_FOUND,
+    });
+
+  const isValid = await checkIfRecruitorIsValid(job.companyId, userId);
+
+  if (!isValid)
+    return res.json({
+      message: RESPONSE_MESSAGES.ERROR.UNAUTHORIZED,
+    });
+
+  const getApplications = await prisma.application.findMany({
+    where: {
+      JobId: Number(id),
+    },
+    include: {
+      job: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  });
+
+  return res.json({
+    message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
+    applications: getApplications,
+  });
+};

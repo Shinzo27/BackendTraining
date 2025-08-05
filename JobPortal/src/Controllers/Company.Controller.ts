@@ -1,17 +1,32 @@
 import { Request, Response } from "express";
 import { prisma } from "../Lib/prisma";
 import { RESPONSE_MESSAGES } from "../Lib/ResponseMessages";
-import { companyValidation, updateCompanyValidation } from "../Lib/ZodValidations";
+import {
+  companyValidation,
+  updateCompanyValidation,
+} from "../Lib/ZodValidations";
 import { checkIfUserValid } from "../Lib/Checks";
 import { ZodError } from "zod";
 
 export const getCompanyDetails = async (req: Request, res: Response) => {
   const { id } = req.params;
 
+  if(isNaN(Number(id))) return res.json({
+    message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST
+  })
+
   const details = await prisma.company.findFirst({
     where: {
       id: Number(id),
     },
+    include: {
+      user: {
+        select: {
+          name: true, 
+          email: true
+        }
+      }
+    }
   });
 
   return details
@@ -37,6 +52,17 @@ export const createCompany = async (req: Request, res: Response) => {
     if (!checkIfValid)
       return res.json({
         message: RESPONSE_MESSAGES.ERROR.COMPANY.NOT_VALID,
+      });
+
+    const checkIfAlreadyExists = await prisma.company.findFirst({
+      where: {
+        name,
+      },
+    });
+
+    if (checkIfAlreadyExists)
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.COMPANY.ALREADY_EXISTS,
       });
 
     const company = await prisma.company.create({
@@ -67,43 +93,58 @@ export const createCompany = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCompanyInfo = async(req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        updateCompanyValidation.parse(req.body)
+export const updateCompanyInfo = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    updateCompanyValidation.parse(req.body);
 
-        const { name, industry } = req.body
+    const { name, industry } = req.body;
 
-        const isValid = await checkIfUserValid(req.user.id)
+    const isValid = await checkIfUserValid(req.user.id);
 
-        if(!isValid) return res.json({
-            message: RESPONSE_MESSAGES.ERROR.COMPANY.NOT_VALID
+    if (!isValid)
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.COMPANY.NOT_VALID,
+      });
+
+    const checkIfAlreadyExists = await prisma.company.findFirst({
+      where: {
+        name: name && name,
+      },
+    });
+
+    if (checkIfAlreadyExists)
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.COMPANY.ALREADY_EXISTS,
+      });
+
+    const company = await prisma.company.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        name: name && name,
+        industry: industry && industry,
+      },
+    });
+
+    return company
+      ? res.json({
+          message: RESPONSE_MESSAGES.COMPANY.UPDATED,
         })
-
-        const company = await prisma.company.update({
-            where: {
-                id: Number(id)
-            }, data: {
-                name: name && name,
-                industry: industry && industry
-            }
-        })
-
-        return company ? res.json({
-            message: RESPONSE_MESSAGES.COMPANY.UPDATED
-        }) : res.json({
-            message: RESPONSE_MESSAGES.ERROR.NOT_FOUND
-        })
-    } catch (error) {
-        if(error instanceof ZodError) {
-            return res.json({
-                message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST,
-                error: error.issues
-            })
-        }
-        return res.json({
-            message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST,
-            error
-        })
+      : res.json({
+          message: RESPONSE_MESSAGES.ERROR.NOT_FOUND,
+        });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST,
+        error: error.issues,
+      });
     }
-}
+    return res.json({
+      message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST,
+      error,
+    });
+  }
+};
