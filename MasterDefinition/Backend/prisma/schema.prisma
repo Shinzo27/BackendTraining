@@ -26,11 +26,11 @@ model User {
   password String
   gender Gender
   image String
-  gr_number String
+  gr_number String?
   phone String
   address String
-  department String
-  class String
+  department String?
+  class String?
   roleId Int
   role Role @relation(fields: [roleId], references: [id])
   createdAt DateTime @default(now())
@@ -63,8 +63,8 @@ model LeaveRequest {
   id Int @id @default(autoincrement())
   userId String
   user User @relation(name: "userId", fields: [userId], references: [id], onDelete: Cascade)
-  startData DateTime
-  endDate DateTime
+  startDate String
+  endDate String
   requestToId String
   requestTo User @relation(name: "requestTo", fields: [requestToId], references: [id], onDelete: Cascade)
   leaveType LeaveType

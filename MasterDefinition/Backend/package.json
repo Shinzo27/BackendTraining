@@ -12,7 +12,9 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "prisma": "^6.13.0",
     "tsc-watch": "^7.1.1"
   },
