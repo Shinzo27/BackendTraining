@@ -83,7 +83,16 @@ model UserLeave {
   usedLeave Int
   academicYear String
   totalWorkingDays Int
-  attendacePercentage Int
+  attendancePercentage Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+model Statics {
+  id Int @id @default(autoincrement())
+  department String
+  class String
+  academicYear String
+  totalLeave Int
+  totalWorkingDays Int
 }

@@ -1,7 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, response, Response } from "express";
 import jwt from "jsonwebtoken";
 import { TokenUser } from "../Lib/Types";
 import { ResponseMessages } from "../Lib/ResponseMessage";
+import { checkIfUserExists } from "../Lib/Checks";
 
 export const checkAuthentication = async (
   req: Request,
@@ -30,16 +31,28 @@ export const checkRegisterUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const roleId = req.body.roleId;
+  const roleId = Number(req.body.roleId);
 
   const user = req.user;
 
-  if (roleId === 1 || roleId === 2 || (roleId === 3 && user)) {
+  if (roleId === 1) {
+    return res.json({
+      message: ResponseMessages.ERROR.UNAUTHORIZE,
+    });
+  } else if (roleId === 2 || (roleId === 3 && user)) {
     if (user?.role !== 1) {
       return res.json({
         message: ResponseMessages.ERROR.UNAUTHORIZE,
       });
     }
+
+    const checkIfExists = await checkIfUserExists(req.body.email);
+    if (checkIfExists)
+      return res.json({
+        success: false,
+        message: ResponseMessages.ERROR.USER.ALREADY_EXISTS,
+      });
+
     return next();
   } else if (roleId === 4) {
     return next();
@@ -67,25 +80,44 @@ export const checkAuthorization = async (
   }
 };
 
-export const checkFacultyLoggedIn = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+export const checkAdminOrFacultyLoggedIn = (
+  role: "admin" | "faculty" | "both"
 ) => {
-  const user = req.user;
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const userRole = req.user?.role;
 
-  if (!user)
-    return res.json({
-      success: false,
-      message: ResponseMessages.ERROR.UNAUTHORIZE,
-    });
-
-  if (user.role === 2 || user.role === 3) {
-    return next();
-  } else {
-    return res.json({
-      success: false,
-      message: ResponseMessages.ERROR.UNAUTHORIZE,
-    });
-  }
+    if (role === "admin") {
+      if (userRole === 1) {
+        return next();
+      } else {
+        return res.json({
+          success: false,
+          message: ResponseMessages.ERROR.UNAUTHORIZE,
+        });
+      }
+    } else if (role === "faculty") {
+      if (userRole === 2 || userRole === 3) {
+        return next();
+      } else {
+        return res.json({
+          success: false,
+          message: ResponseMessages.ERROR.UNAUTHORIZE,
+        });
+      }
+    } else if (role === "both") {
+      if (userRole === 1 || userRole === 2 || userRole === 3) {
+        return next();
+      } else {
+        return res.json({
+          success: false,
+          message: ResponseMessages.ERROR.UNAUTHORIZE,
+        });
+      }
+    } else {
+      return res.json({
+        success: false,
+        message: ResponseMessages.ERROR.UNAUTHORIZE,
+      });
+    }
+  };
 };

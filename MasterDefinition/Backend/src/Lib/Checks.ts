@@ -40,3 +40,19 @@ export const checkRequestToUser = async(id: string) => {
 
   return (user.roleId === 2 || user.roleId === 3) ? true : false;
 }
+
+export const checkValidDaysLeave = async(userId: string, startDate: string, endDate: string) => {
+  const days = await getDays(startDate, endDate)
+
+  const userLeaveDetails = await prisma.userLeave.findFirst({
+    where: {
+      userId
+    }
+  })
+
+  if(userLeaveDetails?.availableLeave as number - days < 0) {
+    return false
+  } else {
+    return true
+  }
+}

@@ -1,22 +1,19 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { ResponseMessages } from "../Lib/ResponseMessage";
-import { success, ZodError } from "zod";
-import { signInSchema, signUpSchema } from "../Lib/ZodSchema";
-import { checkIfUserExists } from "../Lib/Checks";
+import { signInSchema, signUpSchema } from "../Lib/ValidationSchema";
 import { UserLogin, UserRegister } from "../Lib/Types";
 import { prisma } from "../Lib/prisma";
 import { comparePassword, createToken, hashPassword } from "../Lib/Auth";
 
 export const userRegister = async (req: Request, res: Response) => {
   try {
-    signUpSchema.parse(req.body);
+    await signUpSchema.validateAsync(req.body);
 
     const {
       name,
       email,
       password,
       gender,
-      image,
       gr_number,
       phone,
       address,
@@ -24,15 +21,6 @@ export const userRegister = async (req: Request, res: Response) => {
       roleId,
       className,
     } = req.body as UserRegister;
-
-    const checkIfExists = await checkIfUserExists(email);
-
-    if (checkIfExists)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.USER.ALREADY_EXISTS,
-      });
-
     const hashedPassword = await hashPassword(password);
 
     const user = await prisma.user.create({
@@ -41,12 +29,12 @@ export const userRegister = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         gender,
-        image,
+        image: req.file?.path || "",
         gr_number: gr_number ? gr_number : "",
         phone,
         address,
         department: department ? department : "",
-        roleId,
+        roleId: Number(roleId),
         class: className ? className : "",
       },
     });
@@ -60,12 +48,12 @@ export const userRegister = async (req: Request, res: Response) => {
           success: false,
           message: ResponseMessages.ERROR.WENT_WRONG,
         });
-  } catch (error) {
-    if (error instanceof ZodError) {
+  } catch (error: any) {
+    if (error.isJoi) {
       return res.json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
-        error: error.issues,
+        error: error,
       });
     }
     return res.json({
@@ -78,7 +66,7 @@ export const userRegister = async (req: Request, res: Response) => {
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
-    signInSchema.parse(req.body);
+    await signInSchema.validateAsync(req.body);
 
     const { email, password } = req.body as UserLogin;
 
@@ -122,12 +110,12 @@ export const userLogin = async (req: Request, res: Response) => {
       message: ResponseMessages.USER.LOGIN,
       user: userPayload,
     });
-  } catch (error) {
-    if (error instanceof ZodError) {
+  } catch (error: any) {
+    if (error.isJoi) {
       return res.json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
-        error: error.issues,
+        error: error.details,
       });
     }
     return res.json({

@@ -18,9 +18,22 @@ export interface UserLogin {
 }
 
 export interface TokenUser {
-  id: string,
+  id: string;
   name: string;
   email: string;
   role: number;
   iat: number;
+}
+
+export interface UserLeaveDetail {
+  id: number;
+  userId: string;
+  totalLeave: number;
+  availableLeave: number;
+  usedLeave: number;
+  academicYear: string;
+  totalWorkingDays: number;
+  attendancePercentage: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

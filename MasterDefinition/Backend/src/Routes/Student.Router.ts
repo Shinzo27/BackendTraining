@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { applyStudentLeave, getStudentDetails, getStudentLeave } from "../Controllers/Student.Controller";
-import { checkAuthorization } from "../Middlewares/auth";
+import { applyStudentLeave, getStudentDetails, getStudentLeave, getStudentLeaveBalance } from "../Controllers/Student.Controller";
 
 const router = Router()
 
-router.get('/studentDetails', checkAuthorization, getStudentDetails)
-router.post('/applyStudentLeave', checkAuthorization, applyStudentLeave)
-router.get('/getStudentLeave', checkAuthorization, getStudentLeave)
-
+router.get('/studentDetails', getStudentDetails)
+router.post('/applyStudentLeave', applyStudentLeave)
+router.get('/getStudentLeave', getStudentLeave)
+router.get('/getLeaveBalance', getStudentLeaveBalance)
 export default router

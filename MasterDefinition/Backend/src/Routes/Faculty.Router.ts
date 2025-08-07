@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { getLeaveStatus } from "../Controllers/Faculty.Controller";
-import { checkFacultyLoggedIn } from "../Middlewares/auth";
+import {
+  approveLeave,
+  getLeaveStatus,
+} from "../Controllers/Faculty.Controller";
+import { checkAdminOrFacultyLoggedIn } from "../Middlewares/auth";
 
 const router = Router();
 
-router.get("/getLeaveStatus", checkFacultyLoggedIn, getLeaveStatus);
+router.get("/getLeaveStatus", getLeaveStatus);
+router.put("/approveLeave/:id", approveLeave);
 
 export default router;
