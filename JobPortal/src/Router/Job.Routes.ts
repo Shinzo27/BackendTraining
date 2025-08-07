@@ -4,9 +4,9 @@ import { checkAuthentication, checkAuthorization } from "../Middlewares/Auth";
 
 const router = Router();
 
-router.post('/', checkAuthentication, checkAuthorization('RECRUITER'), createJob)
-router.get('/:id', checkAuthentication, checkAuthorization('RECRUITER'), getJobById)
-router.delete('/:id', checkAuthentication, checkAuthorization('RECRUITER'), deleteJob)
-router.get('/', checkAuthentication, getJobs)
+router.post('/', checkAuthorization('RECRUITER'), createJob)
+router.get('/:id', checkAuthorization('RECRUITER'), getJobById)
+router.delete('/:id', checkAuthorization('RECRUITER'), deleteJob)
+router.get('/', getJobs)
 
 export default router;

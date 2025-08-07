@@ -9,34 +9,42 @@ import { checkIfUserValid } from "../Lib/Checks";
 import { ZodError } from "zod";
 
 export const getCompanyDetails = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if(isNaN(Number(id))) return res.json({
-    message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST
-  })
-
-  const details = await prisma.company.findFirst({
-    where: {
-      id: Number(id),
-    },
-    include: {
-      user: {
-        select: {
-          name: true, 
-          email: true
-        }
-      }
-    }
-  });
-
-  return details
-    ? res.json({
-        message: RESPONSE_MESSAGES.COMPANY.FETCHED,
-        details,
-      })
-    : res.json({
-        message: RESPONSE_MESSAGES.ERROR.NOT_FOUND,
+    if (isNaN(Number(id)))
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.BAD_REQUEST,
       });
+
+    const details = await prisma.company.findFirst({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return details
+      ? res.json({
+          message: RESPONSE_MESSAGES.COMPANY.FETCHED,
+          details,
+        })
+      : res.json({
+          message: RESPONSE_MESSAGES.ERROR.NOT_FOUND,
+        });
+  } catch (error) {
+    return res.json({
+      message: RESPONSE_MESSAGES.ERROR.WENT_WRONG,
+      error: error
+    })
+  }
 };
 
 export const createCompany = async (req: Request, res: Response) => {

@@ -38,8 +38,9 @@ export const RESPONSE_MESSAGES = {
       NOT_VALID: "Not valid user to create a job!",
     },
     APPLICATIONS: {
-      ALREADY_EXISTS: "Application for this job already exists!"
+      ALREADY_EXISTS: "Application for this job already exists!",
     },
     UNAUTHORIZED: "You are not authorized to access this route!",
+    WENT_WRONG: "Something went wrong.",
   },
 };

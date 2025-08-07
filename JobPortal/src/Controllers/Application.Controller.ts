@@ -49,64 +49,78 @@ export const applyJob = async (req: Request, res: Response) => {
 };
 
 export const getApplicationByUser = async (req: Request, res: Response) => {
-  const userId = req.user.id;
+  try {
+    const userId = req.user.id;
 
-  const applications = await prisma.application.findMany({
-    where: {
-      UserId: userId,
-    },
-    include: {
-      job: {
-        select: {
-          title: true,
+    const applications = await prisma.application.findMany({
+      where: {
+        UserId: userId,
+      },
+      include: {
+        job: {
+          select: {
+            title: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return res.json({
-    message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
-    applications,
-  });
+    return res.json({
+      message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
+      applications,
+    });
+  } catch (error) {
+    return res.json({
+      message: RESPONSE_MESSAGES.ERROR.WENT_WRONG,
+      error: error,
+    });
+  }
 };
 
 export const getApplicationsForAJob = async (req: Request, res: Response) => {
-  const userId = req.user.id;
-  const { id } = req.params;
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
 
-  const job = await prisma.job.findFirst({
-    where: {
-      id: Number(id),
-    },
-  });
-
-  if (!job)
-    return res.json({
-      message: RESPONSE_MESSAGES.ERROR.NOT_FOUND,
+    const job = await prisma.job.findFirst({
+      where: {
+        id: Number(id),
+      },
     });
 
-  const isValid = await checkIfRecruitorIsValid(job.companyId, userId);
+    if (!job)
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.NOT_FOUND,
+      });
 
-  if (!isValid)
-    return res.json({
-      message: RESPONSE_MESSAGES.ERROR.UNAUTHORIZED,
-    });
+    const isValid = await checkIfRecruitorIsValid(job.companyId, userId);
 
-  const getApplications = await prisma.application.findMany({
-    where: {
-      JobId: Number(id),
-    },
-    include: {
-      job: {
-        select: {
-          title: true,
+    if (!isValid)
+      return res.json({
+        message: RESPONSE_MESSAGES.ERROR.UNAUTHORIZED,
+      });
+
+    const getApplications = await prisma.application.findMany({
+      where: {
+        JobId: Number(id),
+      },
+      include: {
+        job: {
+          select: {
+            title: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return res.json({
-    message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
-    applications: getApplications,
-  });
+    return res.json({
+      message: RESPONSE_MESSAGES.APPLICATIONS.FETCHED,
+      applications: getApplications,
+    });
+  } catch (error) {
+    return res.json({
+      message: RESPONSE_MESSAGES.ERROR.WENT_WRONG,
+      error: error,
+    });
+  }
 };
