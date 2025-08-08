@@ -38,6 +38,7 @@ model User {
   leaveRequest LeaveRequest[] @relation(name: "userId")
   requestTo LeaveRequest[] @relation(name: "requestTo")
   userLeave UserLeave[] @relation(name: "userLeave")
+  blogs Blogs[] @relation(name: "author")
 }
 
 model Role {
@@ -95,4 +96,13 @@ model Statics {
   academicYear String
   totalLeave Int
   totalWorkingDays Int
+}
+
+model Blogs {
+  id Int @id @default(autoincrement())
+  title String
+  content String
+  authorId String
+  coverImage String
+  author User @relation(name: "author", fields: [authorId], references: [id], onDelete: Cascade)
 }

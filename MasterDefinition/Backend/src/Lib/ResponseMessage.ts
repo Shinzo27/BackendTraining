@@ -3,6 +3,8 @@ export const ResponseMessages = {
     LOGIN: "User logged in!",
     REGISTER: "User registered!",
     LOGOUT: "User logged out!",
+    OTP_SENT: "Otp send to registered email!",
+    PASSWORD_RESET: "Password reset successfully!"
   },
   ROLE: {
     CREATED: "Role created!",
@@ -10,7 +12,10 @@ export const ResponseMessages = {
   },
   STUDENT: {
     DETAILS_FETCHED: "Student Details Fetched!",
-    LEAVE_BALANCE_FETCHED: "Leave Balance Fetched!"
+    LEAVE_BALANCE_FETCHED: "Leave Balance Fetched!",
+    LEAVE_FETCHED: "Student's Leave Details Fetched!",
+    DETAILS_UPDATED: "Student details updated!",
+    DELETED: "Student Deleted!"
   },
   LEAVE: {
     REQUESTED: "Leave request applied!",
@@ -20,6 +25,21 @@ export const ResponseMessages = {
   ADMIN: {
     LEAVELIST: "Leave list fetched!",
     LEAVEREPORT: "Leave report fetched!",
+    HODDETAILS: "HOD's details fetched!"
+  },
+  HOD: {
+    UPDATED: "Hod Details Updated!",
+    DELETED: "Hod Details Deleted!"
+  },
+  FACULTY: {
+    FETCHED: "Faculty Details Fetched!",
+    UPDATED: "Faculty Details Updated!",
+    DELETED: "Faculty Details Deleted!"
+  },
+  EMPLOYEE: {
+    FETCHED: "Employee data fetched!",
+    UPDATED: "Employee data updated!",
+    DELETED: "Employee data deleted!"
   },
   STATICDATA: {
     CREATED: "Static data created!",
@@ -48,4 +68,10 @@ export const ResponseMessages = {
     VALIDATION_ERROR: "Validation Error!",
     WENT_WRONG: "Something went wrong!",
   },
+  BLOGS: {
+    CREATED: "Blog created!",
+    FETCHED: "Blog fetched!",
+    UPDATED: "Blog updated!",
+    DELETED: "Blog deleted!"
+  }
 };

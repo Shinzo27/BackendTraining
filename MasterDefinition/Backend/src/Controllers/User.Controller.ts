@@ -4,6 +4,7 @@ import { signInSchema, signUpSchema } from "../Lib/ValidationSchema";
 import { UserLogin, UserRegister } from "../Lib/Types";
 import { prisma } from "../Lib/prisma";
 import { comparePassword, createToken, hashPassword } from "../Lib/Auth";
+import { transporter } from "../Lib/Transporter";
 
 export const userRegister = async (req: Request, res: Response) => {
   try {
@@ -21,6 +22,7 @@ export const userRegister = async (req: Request, res: Response) => {
       roleId,
       className,
     } = req.body as UserRegister;
+
     const hashedPassword = await hashPassword(password);
 
     const user = await prisma.user.create({
@@ -59,7 +61,7 @@ export const userRegister = async (req: Request, res: Response) => {
     return res.json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error,
+      error: error.message,
     });
   }
 };
@@ -132,4 +134,72 @@ export const logout = async (req: Request, res: Response) => {
     success: true,
     message: ResponseMessages.USER.LOGOUT,
   });
+};
+
+export const sendOtp = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const otp = req.body.otp;
+
+    transporter.sendMail(
+      {
+        from: process.env.ETHEREAL_USER,
+        to: user?.email,
+        subject: "OTP from Master Definition for reset password!",
+        text: `Here is your otp for reset password : ${otp}`,
+      },
+      (err, info) => {
+        if (err)
+          return res.json({
+            success: false,
+            message: ResponseMessages.ERROR.WENT_WRONG,
+            error: err,
+          });
+
+        if (info)
+          return res.json({
+            success: true,
+            message: ResponseMessages.USER.OTP_SENT,
+          });
+      }
+    );
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+
+    const { password } = req.body;
+
+    const hashedPassword = await hashPassword(password);
+
+    const updateUser = await prisma.user.update({
+      where: {
+        id: user?.id,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    if (!updateUser) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.json({
+      success: true,
+      message: ResponseMessages.USER.PASSWORD_RESET,
+    });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.meta.cause ? error.meta.cause : error.message,
+    });
+  }
 };

@@ -32,7 +32,6 @@ export const checkRegisterUser = async (
   next: NextFunction
 ) => {
   const roleId = Number(req.body.roleId);
-
   const user = req.user;
 
   if (roleId === 1) {

@@ -37,3 +37,9 @@ export interface UserLeaveDetail {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface BlogDetails {
+  title: string,
+  content: string,
+  authorId: string
+}
