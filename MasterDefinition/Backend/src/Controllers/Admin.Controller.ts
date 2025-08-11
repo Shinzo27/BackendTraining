@@ -216,7 +216,6 @@ export const getStudentList = async (req: Request, res: Response) => {
     if (!department || !className)
       throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
 
-    console.log(department, " || ", className);
     const studentList = await prisma.user.findMany({
       where: {
         department,

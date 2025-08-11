@@ -32,7 +32,6 @@ export const sendReminder = async (
   pendingCount: number
 ) => {
   try {
-    console.log(path.join(__dirname, "../Templates/PendingLeaves.hbs"));
     const emailTemplate = await fs.readFile(
       path.join(__dirname, "../Templates/PendingLeaves.hbs"),
       "utf8"
