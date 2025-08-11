@@ -3,7 +3,6 @@ import {
   approveLeave,
   getLeaveStatus,
 } from "../Controllers/Faculty.Controller";
-import { checkAdminOrFacultyLoggedIn } from "../Middlewares/auth";
 
 const router = Router();
 

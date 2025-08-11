@@ -4,7 +4,7 @@ export const ResponseMessages = {
     REGISTER: "User registered!",
     LOGOUT: "User logged out!",
     OTP_SENT: "Otp send to registered email!",
-    PASSWORD_RESET: "Password reset successfully!"
+    PASSWORD_RESET: "Password reset successfully!",
   },
   ROLE: {
     CREATED: "Role created!",
@@ -15,36 +15,36 @@ export const ResponseMessages = {
     LEAVE_BALANCE_FETCHED: "Leave Balance Fetched!",
     LEAVE_FETCHED: "Student's Leave Details Fetched!",
     DETAILS_UPDATED: "Student details updated!",
-    DELETED: "Student Deleted!"
+    DELETED: "Student Deleted!",
   },
   LEAVE: {
     REQUESTED: "Leave request applied!",
     FETCHED: "Leave request fetched!",
-    UPDATED: "Leave status updated!"
+    UPDATED: "Leave status updated!",
   },
   ADMIN: {
     LEAVELIST: "Leave list fetched!",
     LEAVEREPORT: "Leave report fetched!",
-    HODDETAILS: "HOD's details fetched!"
+    HODDETAILS: "HOD's details fetched!",
   },
   HOD: {
     UPDATED: "Hod Details Updated!",
-    DELETED: "Hod Details Deleted!"
+    DELETED: "Hod Details Deleted!",
   },
   FACULTY: {
     FETCHED: "Faculty Details Fetched!",
     UPDATED: "Faculty Details Updated!",
-    DELETED: "Faculty Details Deleted!"
+    DELETED: "Faculty Details Deleted!",
   },
   EMPLOYEE: {
     FETCHED: "Employee data fetched!",
     UPDATED: "Employee data updated!",
-    DELETED: "Employee data deleted!"
+    DELETED: "Employee data deleted!",
   },
   STATICDATA: {
     CREATED: "Static data created!",
     FETCHED: "Static data fetched!",
-    UPDATED: "Static data updated!"
+    UPDATED: "Static data updated!",
   },
   ERROR: {
     BAD_REQUEST: "Bad Request!",
@@ -59,7 +59,7 @@ export const ResponseMessages = {
     STUDENT: {
       NOT_VALID: "User requesting to is not valid!",
       NOT_AVAILABLE_LEAVE: "No available leave left!",
-      NOT_ENOUGH_LEAVE: "Not enough available leave!"
+      NOT_ENOUGH_LEAVE: "Not enough available leave!",
     },
     ROLE: {
       NOT_FOUND: "Role Not Found!",
@@ -72,6 +72,6 @@ export const ResponseMessages = {
     CREATED: "Blog created!",
     FETCHED: "Blog fetched!",
     UPDATED: "Blog updated!",
-    DELETED: "Blog deleted!"
-  }
+    DELETED: "Blog deleted!",
+  },
 };

@@ -29,30 +29,34 @@ export const getDays = async (
   return numberOfDays + 1;
 };
 
-export const checkRequestToUser = async(id: string) => {
+export const checkRequestToUser = async (id: string) => {
   const user = await prisma.user.findFirst({
     where: {
-      id
-    }
-  })
+      id,
+    },
+  });
 
-  if(!user) return false;
+  if (!user) return false;
 
-  return (user.roleId === 2 || user.roleId === 3) ? true : false;
-}
+  return user.roleId === 2 || user.roleId === 3 ? true : false;
+};
 
-export const checkValidDaysLeave = async(userId: string, startDate: string, endDate: string) => {
-  const days = await getDays(startDate, endDate)
+export const checkValidDaysLeave = async (
+  userId: string,
+  startDate: string,
+  endDate: string
+) => {
+  const days = await getDays(startDate, endDate);
 
   const userLeaveDetails = await prisma.userLeave.findFirst({
     where: {
-      userId
-    }
-  })
+      userId,
+    },
+  });
 
-  if(userLeaveDetails?.availableLeave as number - days < 0) {
-    return false
+  if ((userLeaveDetails?.availableLeave as number) - days < 0) {
+    return false;
   } else {
-    return true
+    return true;
   }
-}
+};

@@ -2,11 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../Lib/prisma";
 import { ResponseMessages } from "../Lib/ResponseMessage";
 import { leaveSchema } from "../Lib/ValidationSchema";
-import {
-  checkRequestToUser,
-  checkValidDaysLeave,
-  getDays,
-} from "../Lib/Checks";
+import { checkRequestToUser, checkValidDaysLeave } from "../Lib/Checks";
 
 export const getStudentDetails = async (req: Request, res: Response) => {
   try {

@@ -1,5 +1,5 @@
 import nodemailer, { Transporter } from "nodemailer";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -12,4 +12,3 @@ export const transporter: Transporter = nodemailer.createTransport({
     pass: process.env.ETHEREAL_PASS,
   },
 });
-

@@ -39,7 +39,7 @@ export interface UserLeaveDetail {
 }
 
 export interface BlogDetails {
-  title: string,
-  content: string,
-  authorId: string
+  title: string;
+  content: string;
+  authorId: string;
 }

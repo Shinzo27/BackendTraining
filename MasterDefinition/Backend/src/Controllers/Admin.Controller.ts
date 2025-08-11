@@ -694,7 +694,7 @@ export const getEmployeeById = async (req: Request, res: Response) => {
 export const updateEmployee = async (req: Request, res: Response) => {
   try {
     await updateUserSchema.validateAsync(req.body);
-    const { id } = req.params
+    const { id } = req.params;
 
     const {
       name,
@@ -711,7 +711,7 @@ export const updateEmployee = async (req: Request, res: Response) => {
     const updateData = await prisma.user.update({
       where: {
         id,
-        roleId: 5
+        roleId: 5,
       },
       data: {
         name,
@@ -722,16 +722,16 @@ export const updateEmployee = async (req: Request, res: Response) => {
         address,
         department,
         class: className,
-        roleId: Number(roleId)
-      }
-    })
+        roleId: Number(roleId),
+      },
+    });
 
-    if(!updateData) throw new Error(ResponseMessages.ERROR.BAD_REQUEST)
+    if (!updateData) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
 
     return res.json({
       success: true,
       message: ResponseMessages.EMPLOYEE.UPDATED,
-    })
+    });
   } catch (error: any) {
     return res.json({
       success: false,
@@ -741,27 +741,27 @@ export const updateEmployee = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteEmployee = async(req: Request, res: Response) => {
+export const deleteEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     const deleteData = await prisma.user.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!deleteData) throw new Error(ResponseMessages.ERROR.NOT_FOUND)
+    if (!deleteData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
     return res.json({
       success: true,
       message: ResponseMessages.EMPLOYEE.DELETED,
-    })
+    });
   } catch (error: any) {
     return res.json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.messsage ? error.message : error.meta.cause
-    })
+      error: error.messsage ? error.message : error.meta.cause,
+    });
   }
-} 
+};
