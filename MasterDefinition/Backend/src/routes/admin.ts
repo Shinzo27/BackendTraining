@@ -23,9 +23,9 @@ import {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
-} from "../Controllers/Admin.Controller";
-import { userRegister } from "../Controllers/User.Controller";
-import { checkRegisterUser } from "../Middlewares/auth";
+} from "../controllers/admin";
+import { userRegister } from "../controllers/user";
+import { checkRegisterUser } from "../middlewares/auth";
 
 const router = Router();
 

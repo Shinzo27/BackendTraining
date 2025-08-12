@@ -1,4 +1,4 @@
-import { UserLeaveDetail } from "./Types";
+import { UserLeaveDetail } from "./types";
 import { prisma } from "./prisma";
 
 export const getStaticData = async (department: string) => {

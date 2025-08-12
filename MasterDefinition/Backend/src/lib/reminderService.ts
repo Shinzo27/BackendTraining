@@ -1,5 +1,5 @@
 import { prisma } from "./prisma";
-import { transporter } from "./Transporter";
+import { transporter } from "./transporter";
 import fs from "fs/promises";
 import Handlebars from "handlebars";
 import path from "path";

@@ -5,9 +5,9 @@ import {
   sendOtp,
   userLogin,
   userRegister,
-} from "../Controllers/User.Controller";
-import { checkAuthorization, checkRegisterUser } from "../Middlewares/auth";
-import { upload } from "../Lib/Upload";
+} from "../controllers/user";
+import { checkAuthorization, checkRegisterUser } from "../middlewares/auth";
+import { upload } from "../lib/upload";
 
 const router = Router();
 

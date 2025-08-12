@@ -1,15 +1,23 @@
 import { Request, Response } from "express";
-import { roleSchema } from "../Lib/ValidationSchema";
-import { prisma } from "../Lib/prisma";
-import { ResponseMessages } from "../Lib/ResponseMessage";
+import { roleSchema } from "../lib/validationSchema";
+import { prisma } from "../lib/prisma";
+import { ResponseMessages } from "../lib/responseMessage";
 
 export const getRoles = async (req: Request, res: Response) => {
-  const roles = await prisma.role.findMany({});
+  try {
+    const roles = await prisma.role.findMany({});
 
-  return res.json({
-    message: ResponseMessages.ROLE.FETCHED,
-    roles,
-  });
+    return res.json({
+      message: ResponseMessages.ROLE.FETCHED,
+      roles,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
 };
 
 export const createRole = async (req: Request, res: Response) => {
@@ -43,12 +51,12 @@ export const createRole = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     if (error.isJoi)
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
         error: error.details,
       });
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error,

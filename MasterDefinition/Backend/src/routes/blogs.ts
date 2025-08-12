@@ -6,9 +6,9 @@ import {
   getBlogs,
   getBlogsByUser,
   updateBlog,
-} from "../Controllers/Blogs.Controller";
-import { checkAdminOrFacultyLoggedIn } from "../Middlewares/auth";
-import { upload } from "../Lib/Upload";
+} from "../controllers/blogs";
+import { checkAdminOrFacultyLoggedIn } from "../middlewares/auth";
+import { upload } from "../lib/upload";
 
 const router = Router();
 

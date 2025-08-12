@@ -4,7 +4,7 @@ import {
   getStudentDetails,
   getStudentLeave,
   getStudentLeaveBalance,
-} from "../Controllers/Student.Controller";
+} from "../controllers/student";
 const router = Router();
 
 router.get("/studentDetails", getStudentDetails);

@@ -1,14 +1,14 @@
 import { Router } from "express";
-import userRouter from "../Routes/User.Router";
-import roleRouter from "../Routes/Role.Router";
-import studentRouter from "../Routes/Student.Router";
-import facultyRouter from "../Routes/Faculty.Router";
-import adminRouter from "../Routes/Admin.Router";
-import blogRouter from "../Routes/Blogs.Router";
+import userRouter from "./user";
+import roleRouter from "./role";
+import studentRouter from "./student";
+import facultyRouter from "./faculty";
+import adminRouter from "./admin";
+import blogRouter from "./blogs";
 import {
   checkAdminOrFacultyLoggedIn,
   checkAuthorization,
-} from "../Middlewares/auth";
+} from "../middlewares/auth";
 
 const router = Router();
 

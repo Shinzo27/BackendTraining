@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { prisma } from "../Lib/prisma";
-import { ResponseMessages } from "../Lib/ResponseMessage";
-import { leaveSchema } from "../Lib/ValidationSchema";
-import { checkRequestToUser, checkValidDaysLeave } from "../Lib/Checks";
+import { prisma } from "../lib/prisma";
+import { ResponseMessages } from "../lib/responseMessage";
+import { leaveSchema } from "../lib/validationSchema";
+import { checkRequestToUser, checkValidDaysLeave } from "../lib/checks";
 
 export const getStudentDetails = async (req: Request, res: Response) => {
   try {
@@ -28,20 +28,18 @@ export const getStudentDetails = async (req: Request, res: Response) => {
       },
     });
 
-    return studentDetails
-      ? res.json({
-          success: true,
-          message: ResponseMessages.STUDENT.DETAILS_FETCHED,
-          details: studentDetails,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.NOT_FOUND,
-        });
-  } catch (error) {
-    return res.json({
+    if (!studentDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.STUDENT.DETAILS_FETCHED,
+      details: studentDetails,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
     });
   }
 };
@@ -49,7 +47,7 @@ export const getStudentDetails = async (req: Request, res: Response) => {
 export const applyStudentLeave = async (req: Request, res: Response) => {
   try {
     await leaveSchema.validateAsync(req.body);
-
+    const { id } = req.user;
     const { startDate, endDate, requestToId, leaveType, reason, status } =
       req.body;
 
@@ -62,7 +60,7 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
       });
 
     const isValidDays = await checkValidDaysLeave(
-      req.user?.id as string,
+      id as string,
       startDate,
       endDate
     );
@@ -75,7 +73,7 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
 
     const leave = await prisma.leaveRequest.create({
       data: {
-        userId: req.user?.id as string,
+        userId: id as string,
         startDate,
         endDate,
         requestToId,
@@ -85,23 +83,20 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
       },
     });
 
-    return leave
-      ? res.json({
-          success: true,
-          message: ResponseMessages.LEAVE.REQUESTED,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.WENT_WRONG,
-        });
+    if (!leave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.LEAVE.REQUESTED,
+    });
   } catch (error: any) {
     if (error.isJoi)
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
         error: error.details,
       });
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error,
@@ -111,26 +106,21 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
 
 export const getStudentLeave = async (req: Request, res: Response) => {
   try {
-    const user = req.user;
+    const { id } = req.user;
 
     const leaves = await prisma.leaveRequest.findMany({
       where: {
-        userId: user?.id,
+        userId: id,
       },
     });
 
-    return leaves
-      ? res.json({
-          success: true,
-          message: ResponseMessages.LEAVE.FETCHED,
-          leaves,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.WENT_WRONG,
-        });
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.LEAVE.FETCHED,
+      leaves,
+    });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
     });
@@ -139,24 +129,21 @@ export const getStudentLeave = async (req: Request, res: Response) => {
 
 export const getStudentLeaveBalance = async (req: Request, res: Response) => {
   try {
+    const { id } = req.user;
+
     const leaveBalance = await prisma.userLeave.findFirst({
       where: {
-        userId: req.user?.id,
+        userId: id,
       },
     });
 
-    return leaveBalance
-      ? res.json({
-          success: true,
-          message: ResponseMessages.STUDENT.LEAVE_BALANCE_FETCHED,
-          data: leaveBalance,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.NOT_FOUND,
-        });
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.STUDENT.LEAVE_BALANCE_FETCHED,
+      data: leaveBalance,
+    });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
     });

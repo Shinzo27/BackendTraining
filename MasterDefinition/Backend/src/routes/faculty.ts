@@ -1,8 +1,5 @@
 import { Router } from "express";
-import {
-  approveLeave,
-  getLeaveStatus,
-} from "../Controllers/Faculty.Controller";
+import { approveLeave, getLeaveStatus } from "../controllers/faculty";
 
 const router = Router();
 

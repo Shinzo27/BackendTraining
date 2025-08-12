@@ -1,8 +1,8 @@
 import { NextFunction, Request, response, Response } from "express";
 import jwt from "jsonwebtoken";
-import { TokenUser } from "../Lib/Types";
-import { ResponseMessages } from "../Lib/ResponseMessage";
-import { checkIfUserExists } from "../Lib/Checks";
+import { TokenUser } from "../lib/types";
+import { ResponseMessages } from "../lib/responseMessage";
+import { checkIfUserExists } from "../lib/checks";
 
 export const checkAuthentication = async (
   req: Request,

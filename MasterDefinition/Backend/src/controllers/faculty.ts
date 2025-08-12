@@ -1,29 +1,32 @@
 import { Request, Response } from "express";
-import { ResponseMessages } from "../Lib/ResponseMessage";
-import { prisma } from "../Lib/prisma";
-import { getDays } from "../Lib/Checks";
-import { calculateData, getStaticData } from "../Lib/CalculateService";
-import { UserLeaveDetail } from "../Lib/Types";
+import { ResponseMessages } from "../lib/responseMessage";
+import { prisma } from "../lib/prisma";
+import { getDays } from "../lib/checks";
+import { calculateData, getStaticData } from "../lib/calculateService";
+import { UserLeaveDetail } from "../lib/types";
 
 export const getLeaveStatus = async (req: Request, res: Response) => {
-  const user = req.user;
+  try {
+    const { id } = req.user;
 
-  const leaves = await prisma.leaveRequest.findMany({
-    where: {
-      requestToId: user?.id,
-    },
-  });
+    const leaves = await prisma.leaveRequest.findMany({
+      where: {
+        requestToId: id,
+      },
+    });
 
-  return leaves
-    ? res.json({
-        success: true,
-        message: ResponseMessages.LEAVE.FETCHED,
-        leaves,
-      })
-    : res.json({
-        success: false,
-        message: ResponseMessages.ERROR.WENT_WRONG,
-      });
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.LEAVE.FETCHED,
+      leaves,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error,
+    });
+  }
 };
 
 export const approveLeave = async (req: Request, res: Response) => {
@@ -125,17 +128,14 @@ export const approveLeave = async (req: Request, res: Response) => {
       },
     });
 
-    return updateLeave
-      ? res.json({
-          success: true,
-          message: ResponseMessages.LEAVE.UPDATED,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.WENT_WRONG,
-        });
+    if (!updateLeave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.LEAVE.UPDATED,
+    });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error,

@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-import indexRouter from "./Routes/Index.Router";
+import indexRouter from "./routes";
 import cookieParser from "cookie-parser";
-import { checkAuthentication } from "./Middlewares/auth";
-import cron from 'node-cron'
-import { sendMail } from "./Lib/ReminderService";
+import { checkAuthentication } from "./middlewares/auth";
+import cron from "node-cron";
+import { sendMail } from "./lib/reminderService";
 
 dotenv.config();
 const app = express();
@@ -22,9 +22,9 @@ app.get("/", async (req: Request, res: Response) => {
   });
 });
 
-cron.schedule('* * * * *', async() => {
-  await sendMail()
-})
+cron.schedule("* * * * *", async () => {
+  await sendMail();
+});
 
 app.listen(process.env.PORT, () =>
   console.log("Server is running on port: ", process.env.PORT)

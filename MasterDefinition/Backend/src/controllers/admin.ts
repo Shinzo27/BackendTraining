@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { prisma } from "../Lib/prisma";
-import { ResponseMessages } from "../Lib/ResponseMessage";
-import { staticDataSchema, updateUserSchema } from "../Lib/ValidationSchema";
+import { prisma } from "../lib/prisma";
+import { ResponseMessages } from "../lib/responseMessage";
+import { staticDataSchema, updateUserSchema } from "../lib/validationSchema";
 
 // Leave Data
 export const getLeaveList = async (req: Request, res: Response) => {
@@ -15,18 +15,13 @@ export const getLeaveList = async (req: Request, res: Response) => {
         },
       },
     });
-    return leaveList
-      ? res.json({
-          success: true,
-          message: ResponseMessages.ADMIN.LEAVELIST,
-          data: leaveList,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.NOT_FOUND,
-        });
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.ADMIN.LEAVELIST,
+      data: leaveList,
+    });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error,
@@ -46,21 +41,16 @@ export const getLeaveReport = async (req: Request, res: Response) => {
       },
     });
 
-    return leaveData
-      ? res.json({
-          success: true,
-          message: ResponseMessages.ADMIN.LEAVEREPORT,
-          data: leaveData,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.NOT_FOUND,
-        });
-  } catch (error) {
-    return res.json({
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.ADMIN.LEAVEREPORT,
+      data: leaveData,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error,
+      error: error.message,
     });
   }
 };
@@ -88,24 +78,21 @@ export const createStaticData = async (req: Request, res: Response) => {
       },
     });
 
-    return staticData
-      ? res.json({
-          success: true,
-          message: ResponseMessages.STATICDATA.CREATED,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.WENT_WRONG,
-        });
+    if (!staticData) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.STATICDATA.CREATED,
+    });
   } catch (error: any) {
     if (error.isJoi) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
         error: error.details,
       });
     }
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.BAD_REQUEST,
       error: error,
@@ -117,13 +104,13 @@ export const getStaticData = async (req: Request, res: Response) => {
   try {
     const data = await prisma.statics.findMany({});
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.STATICDATA.FETCHED,
       data: data,
     });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error,
@@ -157,24 +144,21 @@ export const updateStaticData = async (req: Request, res: Response) => {
       },
     });
 
-    return updateData
-      ? res.json({
-          success: true,
-          message: ResponseMessages.STATICDATA.UPDATED,
-        })
-      : res.json({
-          success: false,
-          message: ResponseMessages.ERROR.NOT_FOUND,
-        });
+    if (!updateData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.STATICDATA.UPDATED,
+    });
   } catch (error: any) {
     if (error.isJoi) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
         error: error.details,
       });
     }
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -194,13 +178,13 @@ export const getStaticDataById = async (req: Request, res: Response) => {
 
     if (!staticData) throw new Error("Data not found!");
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.STATICDATA.FETCHED,
       data: staticData,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -226,13 +210,13 @@ export const getStudentList = async (req: Request, res: Response) => {
 
     if (!studentList) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.STUDENT.DETAILS_FETCHED,
       data: studentList,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -255,13 +239,13 @@ export const getStudentDetailsById = async (req: Request, res: Response) => {
 
     if (!studentDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.STUDENT.DETAILS_FETCHED,
       data: studentDetails,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -283,13 +267,13 @@ export const getStudentLeaveDetails = async (req: Request, res: Response) => {
 
     if (!leaveDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.LEAVE.FETCHED,
       leaveDetails: leaveDetails,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -333,19 +317,19 @@ export const updateStudentDetails = async (req: Request, res: Response) => {
 
     if (!updateUser) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.STUDENT.DETAILS_UPDATED,
     });
   } catch (error: any) {
     if (error.isJoi) {
-      return res.json({
+      return res.status(404).json({
         sucess: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
         error: error.details,
       });
     }
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.meta.cause,
@@ -366,12 +350,15 @@ export const deleteStudent = async (req: Request, res: Response) => {
       },
     });
 
-    return res.json({
+    if (!deleteStudentDetails)
+      throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.STUDENT.DELETED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.meta.cause,
@@ -389,16 +376,13 @@ export const getHodDetails = async (req: Request, res: Response) => {
       },
     });
 
-    if (hodDetails.length === 0)
-      throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.ADMIN.HODDETAILS,
       data: hodDetails,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -419,13 +403,13 @@ export const getHodDetailsById = async (req: Request, res: Response) => {
 
     if (!hodDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.ADMIN.HODDETAILS,
       data: hodDetails,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -470,12 +454,12 @@ export const updateHodDetails = async (req: Request, res: Response) => {
 
     if (!updateHod) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.HOD.UPDATED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.meta.cause,
@@ -498,12 +482,12 @@ export const deleteHod = async (req: Request, res: Response) => {
 
     if (!deleteHodDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.HOD.DELETED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.meta.cause,
@@ -521,16 +505,13 @@ export const getFacultyDetails = async (req: Request, res: Response) => {
       },
     });
 
-    if (facultyDetails.length === 0)
-      throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.FETCHED,
       facultyDetails,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -551,13 +532,13 @@ export const getFacultyDetailsById = async (req: Request, res: Response) => {
 
     if (!facultyDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.FETCHED,
       facultyDetails,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -602,12 +583,12 @@ export const updateFaculty = async (req: Request, res: Response) => {
 
     if (!updateData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.UPDATED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.meta.cause ? error.meta.cause : error.message,
@@ -627,12 +608,12 @@ export const deleteFaculty = async (req: Request, res: Response) => {
 
     if (!deleteData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.DELETED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.meta.cause ? error.meta.cause : error.message,
@@ -650,13 +631,13 @@ export const getEmployeesDetails = async (req: Request, res: Response) => {
       },
     });
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.EMPLOYEE.FETCHED,
       data: employeesData,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -676,13 +657,13 @@ export const getEmployeeById = async (req: Request, res: Response) => {
 
     if (!employeeDetail) throw new Error("Employee not found!");
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.EMPLOYEE.FETCHED,
       data: employeeDetail,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -727,12 +708,12 @@ export const updateEmployee = async (req: Request, res: Response) => {
 
     if (!updateData) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.EMPLOYEE.UPDATED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
@@ -752,12 +733,12 @@ export const deleteEmployee = async (req: Request, res: Response) => {
 
     if (!deleteData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: ResponseMessages.EMPLOYEE.DELETED,
     });
   } catch (error: any) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.messsage ? error.message : error.meta.cause,
