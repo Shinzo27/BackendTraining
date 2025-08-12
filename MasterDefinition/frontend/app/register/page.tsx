@@ -15,8 +15,31 @@ import { registerInitialValue, registerValidations } from "@/lib/Types";
 import { Formik } from "formik";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { registerStudentService } from "@/services/authServices";
+import toast from "react-hot-toast";
 
-const page = () => {
+const Page = () => {
+  const [departments, setDepartments] = useState([]);
+  const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const { data } = await axios.get(
+        "http://localhost:8000/api/statics/getDepartments"
+      );
+      setDepartments(data.department);
+    }
+    fetchData();
+  }, []);
+
+  const handleUpdateFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    setFile(e.target.files[0]);
+  };
+
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-20">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">
@@ -30,11 +53,9 @@ const page = () => {
         <Formik
           initialValues={registerInitialValue}
           validationSchema={registerValidations}
-          onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 400);
+          onSubmit={async (values) => {
+            if (!file) return toast.error("Select correct file");
+            await registerStudentService(values, file);
           }}
           className="flex flex-col items-center justify-center gap-7"
         >
@@ -168,9 +189,13 @@ const page = () => {
                       onChange={handleChange}
                       className="bg-neutral-800 font-semibold"
                     >
-                      <SelectItem value="M.C.A">M.C.A</SelectItem>
-                      <SelectItem value="Bsc.It">Bsc.It</SelectItem>
-                      <SelectItem value="Msc.It">Msc.It</SelectItem>
+                      {departments.map(
+                        (department: { department: string }, index) => (
+                          <SelectItem value={department.department} key={index}>
+                            {department.department}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   {errors.department && touched.department && errors.department}
@@ -188,12 +213,20 @@ const page = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-neutral-800 font-semibold">
                       <SelectItem value="A">A</SelectItem>
-                      <SelectItem value="B">B</SelectItem>
-                      <SelectItem value="C">C</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.className && touched.className && errors.className}
                 </div>
+              </div>
+              <div className="flex items-center justify-center flex-col gap-3">
+                <Label htmlFor="picture">Profile Picture</Label>
+                <Input
+                  id="picture"
+                  type="file"
+                  name="image"
+                  onChange={(e) => handleUpdateFile(e)}
+                  required
+                />
               </div>
               <div>
                 <Button
@@ -217,4 +250,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

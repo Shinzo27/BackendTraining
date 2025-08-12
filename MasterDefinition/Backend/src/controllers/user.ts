@@ -113,7 +113,7 @@ export const userLogin = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.details,
+      error: error.message,
     });
   }
 };

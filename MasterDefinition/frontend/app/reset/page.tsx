@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,28 +6,25 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
 import { resetValidations } from "@/lib/Types";
+import { generateOtp } from "@/services/authServices";
 
 const page = () => {
-    return (
-        <div className="flex items-center justify-center gap-5 flex-col mt-48">
+  return (
+    <div className="flex items-center justify-center gap-5 flex-col mt-48">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">
         <Link href={"/login"} className="flex items-start justify-start w-full">
           <ArrowLeft />
         </Link>
         <div className=" flex items-center justify-center flex-col text-xl font-bold">
           <p className="">Reset password</p>
-          <p className="text-sm pt-3 font-light">
-            Enter your email.
-          </p>
+          <p className="text-sm pt-3 font-light">Enter your email.</p>
         </div>
         <Formik
           initialValues={{ email: "" }}
           validationSchema={resetValidations}
-          onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 400);
+          onSubmit={async (values) => {
+            const getOtp = generateOtp();
+            console.log(getOtp);
           }}
           className="flex flex-col items-center justify-center gap-7"
         >
@@ -39,7 +36,10 @@ const page = () => {
             handleBlur,
             handleSubmit,
           }) => (
-            <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-7">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col items-center justify-center gap-7"
+            >
               <Input
                 type="text"
                 name="email"
@@ -50,15 +50,18 @@ const page = () => {
                 placeholder="Enter your email"
               />
               {errors.email && touched.email && errors.email}
-              <Button className="px-7 py-6 bg-neutral-950 font-bold text-lg">
+              <Button
+                type="submit"
+                className="px-7 py-6 bg-neutral-950 font-bold text-lg"
+              >
                 Get OTP
-              </Button> 
+              </Button>
             </form>
           )}
         </Formik>
       </div>
     </div>
-    );
-}
+  );
+};
 
 export default page;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,8 +6,12 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
 import { loginValidations } from "@/lib/Types";
+import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
-const page = () => {
+const Page = () => {
+  const router = useRouter();
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-48">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">
@@ -22,11 +27,23 @@ const page = () => {
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={loginValidations}
-          onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 400);
+          onSubmit={async (values) => {
+            try {
+              const signin = await signIn("credentials", {
+                email: values.email,
+                password: values.password,
+                redirect: false,
+              });
+
+              if (signin?.ok) {
+                toast.success("Logged in successfully!");
+                router.push("/dashboard");
+              } else {
+                toast.error("Incorrect Email or Password!");
+              }
+            } catch (error: any) {
+              toast.error(error.message);
+            }
           }}
           className="flex flex-col items-center justify-center gap-7"
         >
@@ -37,9 +54,14 @@ const page = () => {
             handleChange,
             handleBlur,
             handleSubmit,
-            /* and other goodies */
           }) => (
-            <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-7">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+              className="flex flex-col items-center justify-center gap-7"
+            >
               <Input
                 type="email"
                 name="email"
@@ -83,4 +105,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

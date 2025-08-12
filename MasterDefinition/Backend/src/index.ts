@@ -5,10 +5,17 @@ import cookieParser from "cookie-parser";
 import { checkAuthentication } from "./middlewares/auth";
 import cron from "node-cron";
 import { sendMail } from "./lib/reminderService";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL || ""],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());

@@ -9,6 +9,7 @@ import {
   checkAdminOrFacultyLoggedIn,
   checkAuthorization,
 } from "../middlewares/auth";
+import staticsRouter from './statics'
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/student", checkAuthorization, studentRouter);
 router.use("/faculty", checkAdminOrFacultyLoggedIn("faculty"), facultyRouter);
 router.use("/admin", checkAdminOrFacultyLoggedIn("admin"), adminRouter);
 router.use("/blogs", checkAuthorization, blogRouter);
+router.use("/statics", staticsRouter)
 
 export default router;

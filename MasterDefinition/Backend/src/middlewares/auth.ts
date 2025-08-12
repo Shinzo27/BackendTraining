@@ -31,33 +31,29 @@ export const checkRegisterUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const roleId = Number(req.body.roleId);
-  const user = req.user;
+  try {
+    const { roleId, email } = req.body;
+    const user = req.user;
 
-  if (roleId === 1) {
-    return res.json({
-      message: ResponseMessages.ERROR.UNAUTHORIZE,
-    });
-  } else if (roleId === 2 || (roleId === 3 && user)) {
-    if (user?.role !== 1) {
-      return res.json({
-        message: ResponseMessages.ERROR.UNAUTHORIZE,
-      });
-    }
-
-    const checkIfExists = await checkIfUserExists(req.body.email);
+    const checkIfExists = await checkIfUserExists(email);
     if (checkIfExists)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.USER.ALREADY_EXISTS,
-      });
+      throw new Error(ResponseMessages.ERROR.USER.ALREADY_EXISTS);
 
-    return next();
-  } else if (roleId === 4) {
-    return next();
-  } else {
-    return res.json({
-      message: ResponseMessages.ERROR.UNAUTHORIZE,
+    if (Number(roleId) === 1) {
+      throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+    } else if (Number(roleId) === 2 || (Number(roleId) === 3 && user)) {
+      if (user?.role !== 1) throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+      return next();
+    } else if (Number(roleId) === 4) {
+      return next();
+    } else {
+      throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+    }
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
     });
   }
 };

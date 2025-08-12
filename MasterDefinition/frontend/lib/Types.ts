@@ -6,15 +6,18 @@ export const loginValidations = Yup.object({
 });
 
 export const resetValidations = Yup.object({
-  email: Yup.string().email("Enter email correctly!").required("Required")
-})
+  email: Yup.string().email("Enter email correctly!").required("Required"),
+});
 
 export const registerValidations = Yup.object({
   name: Yup.string().required(),
   email: Yup.string().email().required(),
   password: Yup.string().required(),
   gender: Yup.string().required(),
-  gr_number: Yup.number().integer().required().typeError("Only Numbers allowed!"),
+  gr_number: Yup.number()
+    .integer()
+    .required()
+    .typeError("Only Numbers allowed!"),
   phone: Yup.string().required(),
   address: Yup.string().required(),
   department: Yup.string().required(),
@@ -22,13 +25,25 @@ export const registerValidations = Yup.object({
 });
 
 export const registerInitialValue = {
-    name: "",
-    email: "",
-    password: "",
-    gender: "",
-    gr_number: "",
-    phone: "",
-    address: "",
-    department: "",
-    className: "",
+  name: "",
+  email: "",
+  password: "",
+  gender: "",
+  gr_number: "",
+  phone: "",
+  address: "",
+  department: "",
+  className: "",
+};
+
+export interface registerStudent {
+  name: string;
+  email: string;
+  password: string;
+  gender: string;
+  gr_number: string;
+  phone: string;
+  address: string;
+  department: string;
+  className: string;
 }
