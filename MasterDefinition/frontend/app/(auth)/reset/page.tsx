@@ -1,4 +1,5 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"; 
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,9 +7,12 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
 import { resetValidations } from "@/lib/Types";
-import { generateOtp } from "@/services/authServices";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
-const page = () => {
+const Page = () => {
+  const router = useRouter();
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-48">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">
@@ -23,8 +27,22 @@ const page = () => {
           initialValues={{ email: "" }}
           validationSchema={resetValidations}
           onSubmit={async (values) => {
-            const getOtp = generateOtp();
-            console.log(getOtp);
+            console.log(values);
+            try {
+              const { data } = await axios.post(
+                "http://localhost:8000/api/users/sendOtp",
+                { email: values.email },
+                {withCredentials: true}
+              );
+              if (data.success) {
+                toast.success(data.message);
+                router.push("/verifyOtp");
+              }
+              //
+            } catch (error: any) {
+              console.log(error);
+              toast.error(error.response.data.error);
+            }
           }}
           className="flex flex-col items-center justify-center gap-7"
         >
@@ -64,4 +82,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

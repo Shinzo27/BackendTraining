@@ -4,7 +4,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { DefaultSession } from "next-auth";
-import bcrypt from "bcryptjs";
 
 export const registerStudentService = async (
   values: registerStudent,
@@ -33,6 +32,7 @@ export const registerStudentService = async (
         ...object,
       },
       {
+        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -84,7 +84,10 @@ export const NEXT_AUTH = {
             {
               email: credentials.email,
               password: credentials.password,
-            }
+            },
+            {
+              withCredentials: true,
+            },  
           );
           if (data.success != true) return null;
 
@@ -128,14 +131,4 @@ export const NEXT_AUTH = {
   pages: {
     signIn: "/signin",
   },
-};
-const max = 100000;
-const min = 999999;
-
-export const generateOtp = async () => {
-  const otp = Math.floor(Math.random() * (max - min)) + min;
-  const hashedPassword = await bcrypt.hash(otp.toString(), 10);
-
-  localStorage.setItem("otp", hashedPassword);
-  return otp;
 };

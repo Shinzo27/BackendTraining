@@ -12,9 +12,9 @@ export const checkAuthentication = async (
   //   const token = req.headers.authorization || ""
   //   const splitToken = token.split(' ')[1]
   //   console.log(splitToken);
-
+  console.log(req.headers.cookie);
   const userToken = req.cookies["user"];
-
+  console.log(userToken);
   if (!userToken) return next();
 
   const user = jwt.verify(
@@ -33,7 +33,7 @@ export const checkRegisterUser = async (
 ) => {
   try {
     const { roleId, email } = req.body;
-    const user = req.user;
+    const user = req.user;  
 
     const checkIfExists = await checkIfUserExists(email);
     if (checkIfExists)
@@ -64,7 +64,7 @@ export const checkAuthorization = async (
   next: NextFunction
 ) => {
   const user = req.user;
-
+  console.log(user);
   if (user) {
     return next();
   } else {

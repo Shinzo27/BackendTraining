@@ -27,7 +27,8 @@ const Page = () => {
   useEffect(() => {
     async function fetchData() {
       const { data } = await axios.get(
-        "http://localhost:8000/api/statics/getDepartments"
+        "http://localhost:8000/api/statics/getDepartments",
+        {withCredentials: true}
       );
       setDepartments(data.department);
     }

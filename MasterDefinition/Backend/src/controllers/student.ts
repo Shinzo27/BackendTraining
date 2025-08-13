@@ -149,3 +149,49 @@ export const getStudentLeaveBalance = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getFacultyOfDepartment = async(req: Request, res: Response) => {
+  try {
+    const { id } = req.user
+    const user = await prisma.user.findFirst({
+      where: {
+        id
+      },
+      select: {
+        department: true
+      }
+    })
+
+    if(!user) throw new Error(ResponseMessages.ERROR.NOT_FOUND)
+
+    const faculty = await prisma.user.findMany({
+      where: {
+        department: user.department,
+        AND: [
+          {
+            roleId: 2
+          },
+          {
+            roleId: 3
+          }
+        ]
+      },
+      select: {
+        id: true,
+        name: true
+      }
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.FACULTY.FETCHED,
+      faculty
+    })
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message
+    })
+  }
+}

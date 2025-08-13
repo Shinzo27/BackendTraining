@@ -4,6 +4,7 @@ export const ResponseMessages = {
     REGISTER: "User registered!",
     LOGOUT: "User logged out!",
     OTP_SENT: "Otp send to registered email!",
+    OTP_VERIFIED: "Otp verified successfully!",
     PASSWORD_RESET: "Password reset successfully!",
   },
   ROLE: {
@@ -55,6 +56,7 @@ export const ResponseMessages = {
       ALREADY_EXISTS: "User already exists!",
       WRONG_PASSWORD: "Incorrect Password!",
       NOT_LOGGEDIN: "User is not logged in!",
+      WRONG_OTP: "Incorrect OTP!"
     },
     STUDENT: {
       NOT_VALID: "User requesting to is not valid!",

@@ -39,6 +39,7 @@ model User {
   requestTo LeaveRequest[] @relation(name: "requestTo")
   userLeave UserLeave[] @relation(name: "userLeave")
   blogs Blogs[] @relation(name: "author")
+  passwordResetToken PasswordResetToken[]
 }
 
 model Role {
@@ -105,4 +106,13 @@ model Blogs {
   authorId String
   coverImage String
   author User @relation(name: "author", fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

@@ -9,6 +9,21 @@ export const resetValidations = Yup.object({
   email: Yup.string().email("Enter email correctly!").required("Required"),
 });
 
+export const verifyOtpValidation = Yup.object({
+  email: Yup.string().email("Enter email correctly!").required("Required"),
+  otp: Yup.number()
+    .integer()
+    .required("Required")
+    .min(100000, "6 numbers required!")
+    .max(999999, "Only 6 numbers are allowed")
+    .typeError("Only numbers are allowed"),
+});
+
+export const resetPasswordValidation = Yup.object({
+  password: Yup.string().required("Required"),
+  confirmPassword: Yup.string().required("Required"),
+});
+
 export const registerValidations = Yup.object({
   name: Yup.string().required(),
   email: Yup.string().email().required(),
@@ -46,4 +61,12 @@ export interface registerStudent {
   address: string;
   department: string;
   className: string;
+}
+
+export interface LeaveData {
+  totalApplication: number;
+  availableLeave: number;
+  approvedLeave: number;
+  rejectedLeave: number;
+  attendancePercentage: number;
 }

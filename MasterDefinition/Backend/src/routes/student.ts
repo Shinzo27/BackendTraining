@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   applyStudentLeave,
+  getFacultyOfDepartment,
   getStudentDetails,
   getStudentLeave,
   getStudentLeaveBalance,
@@ -11,5 +12,6 @@ router.get("/studentDetails", getStudentDetails);
 router.post("/applyStudentLeave", applyStudentLeave);
 router.get("/getStudentLeave", getStudentLeave);
 router.get("/getLeaveBalance", getStudentLeaveBalance);
+
 
 export default router;

@@ -3,7 +3,17 @@ import { ResponseMessages } from "../lib/responseMessage";
 import { signInSchema, signUpSchema } from "../lib/validationSchema";
 import { UserLogin, UserRegister } from "../lib/types";
 import { prisma } from "../lib/prisma";
-import { comparePassword, createToken, hashPassword } from "../lib/auth";
+import {
+  comparePassword,
+  createPasswordResetToken,
+  createToken,
+  generateOtp,
+  generateTempToken,
+  hashPassword,
+  updatePasswordResetToken,
+  verifyHashedOtp,
+  verifyToken,
+} from "../lib/auth";
 import { transporter } from "../lib/transporter";
 
 export const userRegister = async (req: Request, res: Response) => {
@@ -90,9 +100,12 @@ export const userLogin = async (req: Request, res: Response) => {
     };
 
     const token = createToken(user.id, user.name, user.email, user.roleId);
+    const date = new Date();
 
     res.cookie("user", token, {
-      maxAge: 24 * 60 * 60 * 1000,
+      expires: new Date(date.setHours(date.getHours() + 1)),
+      sameSite: "none",
+      secure: true,
     });
 
     // res.header('auth-token', `Bearer ${token}`)
@@ -101,6 +114,7 @@ export const userLogin = async (req: Request, res: Response) => {
       success: true,
       message: ResponseMessages.USER.LOGIN,
       user: userPayload,
+      token: token,
     });
   } catch (error: any) {
     if (error.isJoi) {
@@ -129,8 +143,26 @@ export const logout = async (req: Request, res: Response) => {
 
 export const sendOtp = async (req: Request, res: Response) => {
   try {
-    const { email } = req.user;
-    const { otp } = req.body;
+    const { email } = req.body;
+
+    const { otp, hashedPassword } = await generateOtp();
+
+    const getUser = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!getUser) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    const checkIfExists = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: getUser.id,
+      },
+    });
 
     transporter.sendMail(
       {
@@ -141,14 +173,34 @@ export const sendOtp = async (req: Request, res: Response) => {
       },
       (err, info) => {
         if (err) throw new Error(err.message);
-
-        if (info)
-          return res.status(200).json({
-            success: true,
-            message: ResponseMessages.USER.OTP_SENT,
-          });
       }
     );
+
+    if (!checkIfExists) {
+      const createToken = await createPasswordResetToken(
+        getUser.id,
+        hashedPassword
+      );
+
+      if (!createToken) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
+      return res.json({
+        success: true,
+        message: ResponseMessages.USER.OTP_SENT,
+      });
+    } else {
+      const updateToken = await updatePasswordResetToken(
+        checkIfExists.id,
+        hashedPassword
+      );
+
+      if (!updateToken) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
+      return res.json({
+        success: true,
+        message: ResponseMessages.USER.OTP_SENT,
+      });
+    }
   } catch (error: any) {
     return res.status(500).json({
       success: false,
@@ -158,17 +210,90 @@ export const sendOtp = async (req: Request, res: Response) => {
   }
 };
 
+export const verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    const checkIfExists = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!checkIfExists) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    const now = new Date();
+    if (now > checkIfExists.expiresAt) {
+      throw new Error("Otp got expired! Generate another one!");
+    }
+
+    const comparePassword = await verifyHashedOtp(otp, checkIfExists.tokenHash);
+
+    if (!comparePassword)
+      throw new Error(ResponseMessages.ERROR.USER.WRONG_OTP);
+
+    const payload = {
+      hashToken: checkIfExists.tokenHash,
+      userId: user.id,
+      expiresAt: checkIfExists.expiresAt,
+    };
+
+    const token = await generateTempToken(payload);
+
+    res.cookie("tempToken", token, {
+      expires: new Date(now.setMinutes(now.getMinutes() + 10)),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.USER.OTP_VERIFIED,
+    });
+  } catch (error: any) {
+    return res.status(404).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
 export const resetPassword = async (req: Request, res: Response) => {
   try {
-    const { id } = req.user;
+    const token = req.cookies["tempToken"];
+    if (!token) throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
 
     const { password } = req.body;
+
+    const { hashToken, userId, expiresAt } = await verifyToken(token);
+
+    const checkIfExists = await prisma.passwordResetToken.findFirst({
+      where: {
+        tokenHash: hashToken,
+        userId,
+      },
+    });
+
+    if (!checkIfExists) throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+
+    const now = new Date();
+    if (now > expiresAt) throw new Error("Otp got expired! Generate new one!");
 
     const hashedPassword = await hashPassword(password);
 
     const updateUser = await prisma.user.update({
       where: {
-        id,
+        id: userId,
       },
       data: {
         password: hashedPassword,
@@ -185,7 +310,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     return res.status(404).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause ? error.meta.cause : error.message,
+      error: error.message,
     });
   }
 };
