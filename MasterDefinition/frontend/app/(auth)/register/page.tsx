@@ -19,6 +19,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { registerStudentService } from "@/services/authServices";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [departments, setDepartments] = useState([]);
@@ -28,7 +29,7 @@ const Page = () => {
     async function fetchData() {
       const { data } = await axios.get(
         "http://localhost:8000/api/statics/getDepartments",
-        {withCredentials: true}
+        { withCredentials: true }
       );
       setDepartments(data.department);
     }
@@ -40,6 +41,7 @@ const Page = () => {
 
     setFile(e.target.files[0]);
   };
+  const router = useRouter();
 
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-20">
@@ -57,6 +59,7 @@ const Page = () => {
           onSubmit={async (values) => {
             if (!file) return toast.error("Select correct file");
             await registerStudentService(values, file);
+            router.push("/login");
           }}
           className="flex flex-col items-center justify-center gap-7"
         >

@@ -1,10 +1,9 @@
 import { api } from "@/lib/api";
-// import { leaves } from "@/lib/Constants";
 import { Leave } from "@/lib/Types";
 import { format } from "date-fns";
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-const StudentLeaveHistory = ({
+const FacultyLeaveHistory = ({
   leaves,
   setLeaves,
   setTotalApplication,
@@ -15,7 +14,7 @@ const StudentLeaveHistory = ({
 }) => {
   useEffect(() => {
     async function getLeaves() {
-      const { data } = await api.get("/student/getStudentLeave");
+      const { data } = await api.get("/faculty/getFacultyLeaves");
       setLeaves(data.leaves);
       const length = data.leaves.length;
       setTotalApplication(length);
@@ -63,4 +62,4 @@ const StudentLeaveHistory = ({
   );
 };
 
-export default StudentLeaveHistory;
+export default FacultyLeaveHistory;

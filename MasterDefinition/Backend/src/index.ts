@@ -30,9 +30,9 @@ app.get("/", async (req: Request, res: Response) => {
   });
 });
 
-cron.schedule("* * * * *", async () => {
-  await sendMail();
-});
+// cron.schedule("* * * * *", async () => {
+//   await sendMail();
+// });
 
 app.listen(process.env.PORT, () =>
   console.log("Server is running on port: ", process.env.PORT)

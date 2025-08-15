@@ -75,31 +75,17 @@ export const NEXT_AUTH = {
       },
       async authorize(credentials: any) {
         try {
-          if (!credentials.email || !credentials.password) {
-            return null;
-          }
-
-          const { data } = await axios.post(
-            "http://localhost:8000/api/users/signin",
-            {
-              email: credentials.email,
-              password: credentials.password,
-            },
-            {
-              withCredentials: true,
-            },  
-          );
-          if (data.success != true) return null;
+          if (!credentials.email || !credentials.name) throw new Error("Credentials not found!");
 
           return {
-            id: data.user.id,
-            name: data.user.name,
-            email: data.user.email,
-            role: data.user.role,
+            id: credentials.id,
+            name: credentials.name,
+            email: credentials.email,
+            role: Number(credentials.role),
+            token: credentials.token,
           };
-        } catch (error) {
-          console.log(error);
-          return null;
+        } catch (error: any) {
+          return error.message;
         }
       },
     }),
@@ -115,6 +101,7 @@ export const NEXT_AUTH = {
         token.name = user.name;
         token.email = user.email;
         token.role = user.role;
+        token.token = user.token;
       }
       return token;
     },
@@ -124,6 +111,7 @@ export const NEXT_AUTH = {
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.role = token.role;
+        session.user.token = token.token;
       }
       return session;
     },

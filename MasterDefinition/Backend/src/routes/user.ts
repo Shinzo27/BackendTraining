@@ -19,6 +19,6 @@ router.get("/logout", logout);
 router.post("/sendOtp", sendOtp);
 router.post("/verifyOtp", verifyOtp);
 router.post("/resetPassword", resetPassword);
-router.get("/getFacultyOfDepartment", getFacultyOfDepartment);
+
 
 export default router;

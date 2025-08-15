@@ -85,21 +85,29 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
 
     if (!leave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
 
+    const leaveList = await prisma.leaveRequest.findMany({
+      where: {
+        userId: id as string,
+      },
+    });
+
     return res.status(200).json({
       success: true,
       message: ResponseMessages.LEAVE.REQUESTED,
+      leaves: leaveList,
     });
   } catch (error: any) {
-    if (error.isJoi)
+    if (error.isJoi) {
       return res.status(404).json({
         success: false,
         message: ResponseMessages.ERROR.VALIDATION_ERROR,
         error: error.details,
       });
+    }
     return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error,
+      error: error.message,
     });
   }
 };
@@ -137,10 +145,30 @@ export const getStudentLeaveBalance = async (req: Request, res: Response) => {
       },
     });
 
+    const studentLeave = await prisma.leaveRequest.findMany({
+      where: {
+        userId: id,
+      },
+    });
+
+    const approvedLeave = studentLeave.filter(
+      (leave) => leave.status === "Approved"
+    );
+    const rejectedLeave = studentLeave.filter(
+      (leave) => leave.status === "Rejected"
+    );
+
+    const leaveData = {
+      approvedLeave: approvedLeave.length,
+      rejectedLeave: rejectedLeave.length,
+      availableLeave: leaveBalance?.availableLeave,
+      attendancePercentage: leaveBalance?.attendancePercentage,
+    };
+
     return res.status(200).json({
       success: true,
       message: ResponseMessages.STUDENT.LEAVE_BALANCE_FETCHED,
-      data: leaveBalance,
+      data: leaveData,
     });
   } catch (error) {
     return res.status(500).json({
@@ -150,48 +178,48 @@ export const getStudentLeaveBalance = async (req: Request, res: Response) => {
   }
 };
 
-export const getFacultyOfDepartment = async(req: Request, res: Response) => {
+export const getFacultyOfDepartment = async (req: Request, res: Response) => {
   try {
-    const { id } = req.user
+    const { id } = req.user;
     const user = await prisma.user.findFirst({
       where: {
-        id
+        id,
       },
       select: {
-        department: true
-      }
-    })
+        department: true,
+      },
+    });
 
-    if(!user) throw new Error(ResponseMessages.ERROR.NOT_FOUND)
+    if (!user) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
     const faculty = await prisma.user.findMany({
       where: {
         department: user.department,
-        AND: [
+        OR: [
           {
-            roleId: 2
+            roleId: 2,
           },
           {
-            roleId: 3
-          }
-        ]
+            roleId: 3,
+          },
+        ],
       },
       select: {
         id: true,
-        name: true
-      }
-    })
+        name: true,
+      },
+    });
 
     return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.FETCHED,
-      faculty
-    })
+      faculty,
+    });
   } catch (error: any) {
     return res.json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message
-    })
+      error: error.message,
+    });
   }
-}
+};

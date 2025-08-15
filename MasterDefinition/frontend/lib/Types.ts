@@ -64,9 +64,51 @@ export interface registerStudent {
 }
 
 export interface LeaveData {
-  totalApplication: number;
   availableLeave: number;
   approvedLeave: number;
   rejectedLeave: number;
   attendancePercentage: number;
+}
+
+export interface IFacultyLeaveData {
+  availableLeave: number;
+  approvedLeave: number;
+  studentRequestedTo: number;
+  attendancePercentage: number;
+}
+
+export interface IHodLeaveData {
+  facultyLeaves: number;
+  studentLeaves: number;
+  totalFaculty: number;
+  totalStudents: number;
+}
+
+export const leaveValidation = Yup.object({
+  startDate: Yup.string().required("Required"),
+  endDate: Yup.string().required("Required"),
+  requestToId: Yup.string().required("Required"),
+  leaveType: Yup.string().required("Required"),
+  reason: Yup.string().required(),
+});
+
+export interface leaveValidation {
+  startDate: string;
+  endDate: string;
+  requestToId: string;
+  leaveType: string;
+  reason: string;
+}
+
+export interface Leave {
+  createdAt: string;
+  endDate: string;
+  id: number;
+  leaveType: string;
+  reason: string;
+  requestToId: string;
+  startDate: string;
+  status: string;
+  updatedAt: string;
+  userId: string;
 }

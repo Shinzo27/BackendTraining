@@ -43,3 +43,10 @@ export interface BlogDetails {
   content: string;
   authorId: string;
 }
+
+export interface LeaveList {
+  success: boolean;
+  message: string;
+  facultyLeaves: [];
+  studentLeaves: [];
+}

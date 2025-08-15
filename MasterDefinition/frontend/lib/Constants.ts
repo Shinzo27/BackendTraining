@@ -3,31 +3,31 @@ export const leaves = [
     title: "Lorem ipsum dolor sit amet consectetur.",
     startDate: "12/07/2025",
     endDate: "16/07/2025",
-    status: "pending",
+    status: "Pending",
   },
   {
     title: "Lorem ipsum dolor sit amet consectetur.",
     startDate: "12/07/2025",
     endDate: "16/07/2025",
-    status: "approved",
+    status: "Approved",
   },
   {
     title: "Lorem ipsum dolor sit amet consectetur.",
     startDate: "12/07/2025",
     endDate: "16/07/2025",
-    status: "rejected",
+    status: "Rejected",
   },
   {
     title: "Lorem ipsum dolor sit amet consectetur.",
     startDate: "12/07/2025",
     endDate: "16/07/2025",
-    status: "approved",
+    status: "Approved",
   },
   {
     title: "Lorem ipsum dolor sit amet consectetur.",
     startDate: "12/07/2025",
     endDate: "16/07/2025",
-    status: "approved",
+    status: "Approved",
   },
 ];
 

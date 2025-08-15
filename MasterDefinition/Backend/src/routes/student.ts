@@ -12,6 +12,6 @@ router.get("/studentDetails", getStudentDetails);
 router.post("/applyStudentLeave", applyStudentLeave);
 router.get("/getStudentLeave", getStudentLeave);
 router.get("/getLeaveBalance", getStudentLeaveBalance);
-
+router.get("/getFacultyOfDepartment", getFacultyOfDepartment);
 
 export default router;

@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChevronDownIcon } from "lucide-react";
-import { Button } from "./ui/button";
+import { api, facultyLeaveApply } from "@/lib/api";
+import { Leave, leaveValidation } from "@/lib/Types";
+import { Formik } from "formik";
+import toast from "react-hot-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/button";
+import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
+import { format } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -12,18 +17,13 @@ import {
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { api, studentLeaveApply } from "@/lib/api";
-import { Formik } from "formik";
-import { Leave, leaveValidation } from "@/lib/Types";
-import { format } from "date-fns";
 
 interface Faculty {
   id: string;
   name: string;
 }
 
-const StudentLeaveForm = ({
+const FacultyLeaveForm = ({
   setLeaves,
   setTotalApplication,
 }: {
@@ -41,10 +41,10 @@ const StudentLeaveForm = ({
   useEffect(() => {
     async function getFaculties() {
       try {
-        const { data } = await api.get("/student/getFacultyOfDepartment", {
+        const { data } = await api.get("/faculty/getFacultyOfDepartment", {
           withCredentials: true,
         });
-        console.log(data);
+
         if (data.success) {
           setFaculties(data.faculty);
         }
@@ -72,7 +72,7 @@ const StudentLeaveForm = ({
           validationSchema={leaveValidation}
           onSubmit={async (values) => {
             try {
-              const leave = await studentLeaveApply(values);
+              const leave = await facultyLeaveApply(values);
               if (leave.success) {
                 toast.success(leave.message);
                 setLeaves(leave.leaves);
@@ -80,7 +80,7 @@ const StudentLeaveForm = ({
                 setTotalApplication(length);
               }
             } catch (error: any) {
-              console.log(error.message);
+              toast.error(error.message);
             }
           }}
         >
@@ -236,4 +236,4 @@ const StudentLeaveForm = ({
   );
 };
 
-export default StudentLeaveForm;
+export default FacultyLeaveForm;

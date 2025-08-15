@@ -36,12 +36,14 @@ export const roleSchema = Joi.object({
 });
 
 export const leaveSchema = Joi.object({
-  startDate: Joi.string(),
-  endDate: Joi.string(),
-  requestToId: Joi.string(),
-  leaveType: Joi.string().valid("FirstHalf", "SecondHalf", "FullDay"),
-  reason: Joi.string(),
-  status: Joi.string().valid("Pending", "Approved", "Rejected"),
+  startDate: Joi.string().required(),
+  endDate: Joi.string().required(),
+  requestToId: Joi.string().required(),
+  leaveType: Joi.string()
+    .valid("FirstHalf", "SecondHalf", "FullDay")
+    .required(),
+  reason: Joi.string().required(),
+  status: Joi.string().valid("Pending", "Approved", "Rejected").required(),
 });
 
 export const staticDataSchema = Joi.object({

@@ -9,6 +9,7 @@ import { loginValidations } from "@/lib/Types";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { login } from "@/lib/api";
 
 const Page = () => {
   const router = useRouter();
@@ -29,17 +30,22 @@ const Page = () => {
           validationSchema={loginValidations}
           onSubmit={async (values) => {
             try {
-              const signin = await signIn("credentials", {
-                email: values.email,
-                password: values.password,
-                redirect: false,
-              });
-
-              if (signin?.ok) {
-                toast.success("Logged in successfully!");
-                router.push("/dashboard");
-              } else {
-                toast.error("Incorrect Email or Password!");
+              const signin = await login(values.email, values.password);
+              if (signin.success) {
+                console.log(signin);
+                const authSignin = await signIn("credentials", {
+                  redirect: false,
+                  email: signin.user.email,
+                  id: signin.user.id,
+                  role: signin.user.role,
+                  name: signin.user.name,
+                  token: signin.token,
+                });
+                console.log(authSignin);
+                if (authSignin?.ok) {
+                  router.push("/dashboard");
+                  toast.success(signin.message);
+                }
               }
             } catch (error: any) {
               toast.error(error.message);

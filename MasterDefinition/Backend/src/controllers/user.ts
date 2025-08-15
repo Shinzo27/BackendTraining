@@ -53,10 +53,33 @@ export const userRegister = async (req: Request, res: Response) => {
 
     if (!user) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
 
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.USER.REGISTER,
-    });
+    if (Number(roleId) === 4 || Number(roleId) === 3) {
+      const staticData = await prisma.statics.findFirst({
+        where: {
+          department,
+        },
+      });
+
+      if (!staticData) throw new Error("Static data not found!");
+
+      const userLeaveData = await prisma.userLeave.create({
+        data: {
+          userId: user.id,
+          totalLeave: staticData.totalLeave,
+          availableLeave: staticData.totalLeave,
+          usedLeave: 0,
+          academicYear: staticData.academicYear,
+          totalWorkingDays: staticData?.totalWorkingDays,
+          attendancePercentage: 100,
+        },
+      }); 
+
+      if (userLeaveData)
+        return res.status(200).json({
+          success: true,
+          message: ResponseMessages.USER.REGISTER,
+        });
+    }
   } catch (error: any) {
     if (error.isJoi) {
       return res.status(404).json({
@@ -103,9 +126,9 @@ export const userLogin = async (req: Request, res: Response) => {
     const date = new Date();
 
     res.cookie("user", token, {
-      expires: new Date(date.setHours(date.getHours() + 1)),
-      sameSite: "none",
       secure: true,
+      httpOnly: true,
+      sameSite: "none",
     });
 
     // res.header('auth-token', `Bearer ${token}`)

@@ -34,8 +34,12 @@ export const checkRequestToUser = async (id: string) => {
     where: {
       id,
     },
+    select: {
+      id: true,
+      roleId: true
+    }
   });
-
+  console.log(user);
   if (!user) return false;
 
   return user.roleId === 2 || user.roleId === 3 ? true : false;
