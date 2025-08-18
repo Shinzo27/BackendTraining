@@ -18,7 +18,7 @@ const Student = () => {
         <p>Welcome back, {session?.user.name}</p>
       </div>
       <StudentLeaveData totalApplication={totalApplication} />
-      <div className="flex items-start justify-center gap-20 mt-10">
+      <div className="flex items-start justify-center gap-20 mt-10 flex-wrap">
         <StudentLeaveForm
           setLeaves={setLeaves}
           setTotalApplication={setTotalApplication}

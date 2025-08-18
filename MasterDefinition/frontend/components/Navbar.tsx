@@ -2,14 +2,19 @@
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const Navbar = () => {
-  const router = useRouter();
   const { data: session } = useSession();
   const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push("/login");
+    try {
+      const { data } = await api.get("/users/logout");
+      if (data.success) {
+        await signOut({ redirect: true });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -18,7 +23,7 @@ const Navbar = () => {
       <div className="flex items-center justify-around gap-10 text-lg ">
         {session?.user ? (
           <>
-            <Link href={"/login"} className="font-bold">
+            <Link href={"/login"} className="font-bold hidden sm:block">
               {session.user.name}
             </Link>
             <Button

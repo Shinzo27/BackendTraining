@@ -99,7 +99,7 @@ const FacultyLeaveForm = ({
                 handleSubmit();
               }}
             >
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex items-center justify-center gap-6 sm:flex-row flex-col">
                 <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                   <PopoverTrigger asChild className="py-6">
                     <Button
@@ -174,7 +174,7 @@ const FacultyLeaveForm = ({
                 </Popover>
                 {errors.endDate && touched.endDate && errors.endDate}
               </div>
-              <div className="flex items-center justify-center gap-5">
+              <div className="flex items-center justify-center gap-5 sm:flex-row flex-col">
                 <Select
                   name="requestToId"
                   defaultValue={values.requestToId}
@@ -213,7 +213,7 @@ const FacultyLeaveForm = ({
               <div className="flex items-center justify-center gap-5">
                 <Textarea
                   name="reason"
-                  className="px-4 py-6 w-[445px]"
+                  className="px-4 py-6 sm:w-[445px] w-[250px]"
                   placeholder="Enter the reason "
                   defaultValue={values.reason}
                   onChange={handleChange}

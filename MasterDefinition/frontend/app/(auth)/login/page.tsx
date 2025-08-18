@@ -32,7 +32,6 @@ const Page = () => {
             try {
               const signin = await login(values.email, values.password);
               if (signin.success) {
-                console.log(signin);
                 const authSignin = await signIn("credentials", {
                   redirect: false,
                   email: signin.user.email,
@@ -41,13 +40,13 @@ const Page = () => {
                   name: signin.user.name,
                   token: signin.token,
                 });
-                console.log(authSignin);
                 if (authSignin?.ok) {
                   router.push("/dashboard");
                   toast.success(signin.message);
                 }
               }
             } catch (error: any) {
+              console.log(error);
               toast.error(error.message);
             }
           }}

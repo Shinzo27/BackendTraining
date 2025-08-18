@@ -66,10 +66,7 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
     );
 
     if (!isValidDays)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.STUDENT.NOT_ENOUGH_LEAVE,
-      });
+      throw new Error(ResponseMessages.ERROR.STUDENT.NOT_ENOUGH_LEAVE);
 
     const leave = await prisma.leaveRequest.create({
       data: {
@@ -97,6 +94,7 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
       leaves: leaveList,
     });
   } catch (error: any) {
+    console.log(error);
     if (error.isJoi) {
       return res.status(404).json({
         success: false,

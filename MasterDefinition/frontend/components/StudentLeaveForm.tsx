@@ -73,14 +73,17 @@ const StudentLeaveForm = ({
           onSubmit={async (values) => {
             try {
               const leave = await studentLeaveApply(values);
-              if (leave.success) {
+              console.log(leave);
+              if (leave && leave.success) {
                 toast.success(leave.message);
                 setLeaves(leave.leaves);
                 const length = leave.leaves.length;
                 setTotalApplication(length);
               }
             } catch (error: any) {
-              console.log(error.message);
+              console.log(error);
+              toast.error(error.message)
+              // console.log(error.message);
             }
           }}
         >
@@ -93,13 +96,13 @@ const StudentLeaveForm = ({
             setFieldValue,
           }) => (
             <form
-              className="mt-6 flex items-center justify-center gap-10 flex-col"
+              className="mt-6 flex items-center justify-center gap-10 flex-col "
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSubmit();
               }}
             >
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex items-center justify-center gap-6 flex-col sm:flex-row">
                 <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                   <PopoverTrigger asChild className="py-6">
                     <Button
@@ -174,7 +177,7 @@ const StudentLeaveForm = ({
                 </Popover>
                 {errors.endDate && touched.endDate && errors.endDate}
               </div>
-              <div className="flex items-center justify-center gap-5">
+              <div className="flex items-center justify-center gap-5 sm:flex-row flex-col">
                 <Select
                   name="requestToId"
                   defaultValue={values.requestToId}
@@ -213,7 +216,7 @@ const StudentLeaveForm = ({
               <div className="flex items-center justify-center gap-5">
                 <Textarea
                   name="reason"
-                  className="px-4 py-6 w-[445px]"
+                  className="px-4 py-6 sm:w-[445px] w-[250px]"
                   placeholder="Enter the reason "
                   defaultValue={values.reason}
                   onChange={handleChange}

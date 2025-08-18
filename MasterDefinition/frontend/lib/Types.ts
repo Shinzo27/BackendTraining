@@ -111,4 +111,38 @@ export interface Leave {
   status: string;
   updatedAt: string;
   userId: string;
+  user: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface Faculty {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  class: string;
+}
+
+export interface Student {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  class: string;
+}
+
+export interface HodData {
+  facultyLeaves: number;
+  studentLeaves: number;
+  totalFaculty: number;
+  totalStudents: number;
+}
+
+export interface IAdminData {
+  totalUser: number;
+  pendingLeaves: number;
+  approvalPercentage: number;
+  totalRequest: number;
 }

@@ -45,7 +45,7 @@ const FacultyLeaveApprovalList = () => {
   };
 
   return (
-    <div className="bg-neutral-800 p-10 rounded-2xl min-w-[800px] flex items-center justify-center flex-col">
+    <div className="bg-neutral-800 p-10 rounded-2xl lg:min-w-[800px] md:min-w-[700px] min-w-[300px] flex items-center justify-center flex-col">
       <div className="w-full flex items-start justify-center     flex-col">
         <h1 className="font-bold text-2xl">Leave Approval</h1>
         <h1 className="font-light text-sm">All requested leave list</h1>
@@ -55,7 +55,7 @@ const FacultyLeaveApprovalList = () => {
           leaves?.map((leave: Leave, index: number) => (
             <div
               key={index}
-              className="bg-neutral-950 p-5 rounded-2xl w-[650px] "
+              className="bg-neutral-950 p-5 rounded-2xl sm:w-[650px] w-[250px]"
             >
               <div className="flex items-center justify-between gap-5">
                 <p className="w-72 font-semibold truncate">{leave.reason}</p>
@@ -93,6 +93,9 @@ const FacultyLeaveApprovalList = () => {
                     {leave.status}
                   </p>
                 )}
+              </div>
+              <div className="mt-5">
+                <p>Applied by - Manav Patel</p>
               </div>
               <div className="flex items-center justify-between mt-5">
                 <p>{format(leave.startDate, "dd-MM-yyyy")}</p>

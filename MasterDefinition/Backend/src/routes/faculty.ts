@@ -7,7 +7,6 @@ import {
   getFacultLeaveBalance,
   getFacultyLeaves,
   getFacultyOfDepartment,
-  getHodData,
   getLeaveStatus,
 } from "../controllers/faculty";
 
@@ -23,6 +22,5 @@ router.get("/getFacultLeaveBalance", getFacultLeaveBalance);
 // Hod
 router.get("/getAllLeavesOfHod", getAllLeavesOfHod);
 router.put("/approveLeaveHod/:id", approveLeaveHod);
-router.get("/getHodData", getHodData);
 
 export default router;

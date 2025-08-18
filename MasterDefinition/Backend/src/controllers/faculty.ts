@@ -7,7 +7,6 @@ import {
   getDays,
 } from "../lib/checks";
 import { calculateData, getStaticData } from "../lib/calculateService";
-import { LeaveList, UserLeaveDetail } from "../lib/types";
 import { leaveSchema } from "../lib/validationSchema";
 
 export const getLeaveStatus = async (req: Request, res: Response) => {
@@ -49,11 +48,7 @@ export const approveLeave = async (req: Request, res: Response) => {
       },
     });
 
-    if (!leaveDetails)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.NOT_FOUND,
-      });
+    if (!leaveDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
     const userLeaveDetail = await prisma.userLeave.findFirst({
       where: {
@@ -61,47 +56,23 @@ export const approveLeave = async (req: Request, res: Response) => {
       },
     });
 
-    if (userLeaveDetail?.availableLeave === 0) {
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.STUDENT.NOT_AVAILABLE_LEAVE,
-      });
-    }
+    if (!userLeaveDetail) throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
 
-    let newUserLeaveDetails;
+    if (userLeaveDetail?.availableLeave === 0)
+      throw new Error(ResponseMessages.ERROR.STUDENT.NOT_AVAILABLE_LEAVE);
 
     const staticData = await getStaticData(leaveDetails.user.department || "");
-    if (!userLeaveDetail) {
-      newUserLeaveDetails = await prisma.userLeave.create({
-        data: {
-          userId: leaveDetails.userId,
-          totalLeave: staticData?.totalLeave || 0,
-          availableLeave: staticData?.totalLeave || 0,
-          usedLeave: 0,
-          academicYear: staticData?.academicYear || "",
-          totalWorkingDays: staticData?.totalWorkingDays || 0,
-          attendancePercentage: 100,
-        },
-      });
-    }
 
     const getLeaveDays = await getDays(
       leaveDetails.startDate,
       leaveDetails.endDate
     );
 
-    const updatedUserLeaveDetails = userLeaveDetail
-      ? userLeaveDetail
-      : (newUserLeaveDetails as UserLeaveDetail);
-
-    if (updatedUserLeaveDetails.availableLeave - getLeaveDays < 0)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.STUDENT.NOT_ENOUGH_LEAVE,
-      });
+    if (userLeaveDetail.availableLeave - getLeaveDays < 0)
+      throw new Error(ResponseMessages.ERROR.STUDENT.NOT_ENOUGH_LEAVE);
 
     const calculatedData = await calculateData(
-      updatedUserLeaveDetails,
+      userLeaveDetail,
       getLeaveDays,
       staticData?.totalWorkingDays as number
     );
@@ -115,15 +86,11 @@ export const approveLeave = async (req: Request, res: Response) => {
       },
     });
 
-    if (!updateLeaveRequest)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.WENT_WRONG,
-      });
+    if (!updateLeaveRequest) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
 
     const updateLeave = await prisma.userLeave.update({
       where: {
-        id: updatedUserLeaveDetails.id,
+        id: userLeaveDetail.id,
       },
       data: {
         availableLeave: calculatedData.availableLeave,
@@ -135,7 +102,19 @@ export const approveLeave = async (req: Request, res: Response) => {
 
     if (!updateLeave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
 
-    const leaveList = await getLeaveStatus(req, res);
+    const leaveList = await prisma.leaveRequest.findMany({
+      where: {
+        requestToId: leaveDetails.requestToId,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    });
 
     return res.status(200).json({
       success: true,
@@ -342,6 +321,14 @@ export const getAllLeavesOfHod = async (req: Request, res: Response) => {
           roleId: 3,
         },
       },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
     });
 
     const getStudentLeaves = await prisma.leaveRequest.findMany({
@@ -351,13 +338,54 @@ export const getAllLeavesOfHod = async (req: Request, res: Response) => {
           roleId: 4,
         },
       },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
     });
+
+    const getFacultyList = await prisma.user.findMany({
+      where: {
+        roleId: 3,
+        department: hod.department,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
+        class: true,
+      },
+    });
+
+    const getStudentList = await prisma.user.findMany({
+      where: {
+        roleId: 4,
+        department: hod.department,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
+        class: true,
+      },
+    });
+
+    const hodData = await getHodData(req, res);
 
     return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.FETCHED,
       facultyLeaves: getFacultyLeaves,
       studentLeaves: getStudentLeaves,
+      studentList: getStudentList,
+      facultyList: getFacultyList,
+      hodData: hodData,
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -372,6 +400,7 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+    const { id: userId } = req.user;
 
     const leaveDetails = await prisma.leaveRequest.findFirst({
       where: {
@@ -383,11 +412,7 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
       },
     });
 
-    if (!leaveDetails)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.NOT_FOUND,
-      });
+    if (!leaveDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
     const userLeaveDetail = await prisma.userLeave.findFirst({
       where: {
@@ -395,47 +420,26 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
       },
     });
 
-    if (userLeaveDetail?.availableLeave === 0) {
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.STUDENT.NOT_AVAILABLE_LEAVE,
-      });
-    }
+    if (!userLeaveDetail) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
 
-    let newUserLeaveDetails;
+    if (status === "Approve" && userLeaveDetail.availableLeave === 0)
+      throw new Error(ResponseMessages.ERROR.STUDENT.NOT_AVAILABLE_LEAVE);
 
     const staticData = await getStaticData(leaveDetails.user.department || "");
-    if (!userLeaveDetail) {
-      newUserLeaveDetails = await prisma.userLeave.create({
-        data: {
-          userId: leaveDetails.userId,
-          totalLeave: staticData?.totalLeave || 0,
-          availableLeave: staticData?.totalLeave || 0,
-          usedLeave: 0,
-          academicYear: staticData?.academicYear || "",
-          totalWorkingDays: staticData?.totalWorkingDays || 0,
-          attendancePercentage: 100,
-        },
-      });
-    }
 
     const getLeaveDays = await getDays(
       leaveDetails.startDate,
       leaveDetails.endDate
     );
 
-    const updatedUserLeaveDetails = userLeaveDetail
-      ? userLeaveDetail
-      : (newUserLeaveDetails as UserLeaveDetail);
-
-    if (updatedUserLeaveDetails.availableLeave - getLeaveDays < 0)
-      return res.json({
-        success: false,
-        message: ResponseMessages.ERROR.STUDENT.NOT_ENOUGH_LEAVE,
-      });
+    if (
+      status === "Approve" &&
+      userLeaveDetail.availableLeave - getLeaveDays < 0
+    )
+      throw new Error(ResponseMessages.ERROR.STUDENT.NOT_ENOUGH_LEAVE);
 
     const calculatedData = await calculateData(
-      updatedUserLeaveDetails,
+      userLeaveDetail,
       getLeaveDays,
       staticData?.totalWorkingDays as number
     );
@@ -457,7 +461,7 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
 
     const updateLeave = await prisma.userLeave.update({
       where: {
-        id: updatedUserLeaveDetails.id,
+        id: userLeaveDetail.id,
       },
       data: {
         availableLeave: calculatedData.availableLeave,
@@ -469,13 +473,46 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
 
     if (!updateLeave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
 
-    const leaveList: any = await getAllLeavesOfHod(req, res);
+    const getFacultyLeaves = await prisma.leaveRequest.findMany({
+      where: {
+        requestToId: userId,
+        user: {
+          roleId: 3,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    const getStudentLeaves = await prisma.leaveRequest.findMany({
+      where: {
+        requestToId: userId,
+        user: {
+          roleId: 4,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    });
 
     return res.status(200).json({
       success: true,
       message: ResponseMessages.LEAVE.UPDATED,
-      studentLeaves: leaveList.studentLeaves,
-      facultyLeaves: leaveList.facultyLeaves,
+      error: "Hello world",
+      studentLeaves: getStudentLeaves,
+      facultyLeaves: getFacultyLeaves,
     });
   } catch (error) {
     return res.status(500).json({
@@ -530,19 +567,51 @@ export const getHodData = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json({
+    const data = {
+      facultyLeaves,
+      studentLeaves,
+      totalFaculty,
+      totalStudents,
+    };
+
+    return data;
+  } catch (error: any) {
+    return res.status(500).json({
       success: true,
-      message: ResponseMessages.FACULTY.FETCHED,
-      data: {
-        facultyLeaves,
-        studentLeaves,
-        totalFaculty,
-        totalStudents,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
+export const getStudentFacultyOfHod = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user;
+
+    const getHodDetails = await prisma.user.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!getHodDetails) throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+
+    const getFacultyList = await prisma.user.findMany({
+      where: {
+        roleId: 3,
+        department: getHodDetails.department,
+      },
+    });
+
+    const getStudentList = await prisma.user.findMany({
+      where: {
+        roleId: 4,
+        department: getHodDetails.department,
       },
     });
   } catch (error: any) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
     });

@@ -4,19 +4,18 @@ import Faculty from "@/components/Faculty";
 import Hod from "@/components/Hod";
 import Student from "@/components/Student";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect } from "react";
-
 
 const Page = () => {
   const { data: session } = useSession();
-  const router = useRouter()
+  const router = useRouter();
 
-  useEffect(()=> {
-    if(!session?.user) {
-      return router.push('/')
+  useEffect(() => {
+    if (!session?.user) {
+      return router.push("/");
     }
-  }, [router, session])
+  }, [router, session]);
 
   return session?.user?.role === 1 ? (
     <Admin />
@@ -26,7 +25,9 @@ const Page = () => {
     <Faculty />
   ) : session?.user?.role === 4 ? (
     <Student />
-  ) : null;
+  ) : (
+    redirect("/")
+  );
 };
 
 export default Page;

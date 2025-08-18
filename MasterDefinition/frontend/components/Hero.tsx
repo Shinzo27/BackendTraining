@@ -8,12 +8,12 @@ const Hero = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  useEffect(()=> {
-    if(session?.user) {
-      return router.push('/dashboard')
+  useEffect(() => {
+    if (session?.user) {
+      return router.push("/dashboard");
     }
-  }, [session, router])
-  
+  }, [session, router]);
+
   return (
     <div className="h-screen text-white flex items-center justify-center flex-col gap-5">
       <p className="text-4xl font-bold">Welcome to LMS.</p>

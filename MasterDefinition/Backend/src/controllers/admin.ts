@@ -31,20 +31,36 @@ export const getLeaveList = async (req: Request, res: Response) => {
 
 export const getLeaveReport = async (req: Request, res: Response) => {
   try {
-    const leaveData = await prisma.userLeave.findMany({
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
+    const totalUser = await prisma.user.count({});
+
+    const pendingLeaves = await prisma.leaveRequest.count({
+      where: {
+        status: "Pending",
       },
     });
+
+    const leaveCount = await prisma.leaveRequest.count();
+
+    const approvalPercentage = await prisma.leaveRequest.groupBy({
+      by: ["status"],
+      _count: {
+        id: true,
+      },
+    });
+
+    const percentage = (approvalPercentage[1]._count.id * 100) / leaveCount;
+
+    const leaveData = {
+      totalUser: totalUser,
+      pendingLeaves: pendingLeaves,
+      approvalPercentage: percentage,
+      totalRequest: leaveCount,
+    };
 
     return res.status(200).json({
       success: true,
       message: ResponseMessages.ADMIN.LEAVEREPORT,
-      data: leaveData,
+      leaveData: leaveData,
     });
   } catch (error: any) {
     return res.status(500).json({

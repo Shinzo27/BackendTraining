@@ -23,7 +23,7 @@ const StudentLeaveHistory = ({
     getLeaves();
   }, [setLeaves, setTotalApplication]);
   return (
-    <div className="bg-neutral-800 p-10 rounded-2xl min-w-[575px]">
+    <div className="bg-neutral-800 p-10 rounded-2xl sm:min-w-[575px] min-w-[300px]">
       <div>
         <h1 className="font-bold text-2xl">Leave History</h1>
         <h1 className="font-light text-sm">All applied leave list</h1>
@@ -33,7 +33,7 @@ const StudentLeaveHistory = ({
           leaves?.map((leave: Leave, index: number) => (
             <div
               key={index}
-              className="bg-neutral-950 p-5 rounded-2xl w-[450px] "
+              className="bg-neutral-950 p-5 rounded-2xl sm:w-[450px] w-[250px]"
             >
               <div className="flex items-center justify-between gap-5">
                 <p className="w-72 font-semibold truncate">{leave.reason}</p>

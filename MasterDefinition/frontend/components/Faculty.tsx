@@ -12,13 +12,13 @@ const Faculty = () => {
   const [totalApplication, setTotalApplication] = useState(0);
 
   return (
-    <div className="mb-10 ">
+    <div className="mb-10">
       <div className="m-5">
         <h1 className="font-bold text-2xl">Faculty Dashboard</h1>
         <p>Welcome back, {session?.user.name}</p>
       </div>
       <FacultyLeaveData totalApplication={totalApplication} />
-      <div className="flex items-start justify-center gap-20 mt-10">
+      <div className="flex lg:items-start items-center justify-center gap-20 mt-10 lg:flex-row flex-col">
         <FacultyLeaveForm
           setLeaves={setLeaves}
           setTotalApplication={setTotalApplication}

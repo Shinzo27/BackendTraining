@@ -39,7 +39,6 @@ export const checkRequestToUser = async (id: string) => {
       roleId: true
     }
   });
-  console.log(user);
   if (!user) return false;
 
   return user.roleId === 2 || user.roleId === 3 ? true : false;

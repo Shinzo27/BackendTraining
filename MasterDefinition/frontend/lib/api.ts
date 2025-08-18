@@ -13,7 +13,7 @@ export const login = async (email: string, password: string) => {
     if (data.success) return data;
   } catch (error: any) {
     console.log(error);
-    throw new Error(error.message);
+    throw new Error(error.response.data.error);
   }
 };
 
@@ -30,7 +30,7 @@ export const studentLeaveApply = async (values: leaveValidation) => {
 
     if (data.success) return data;
   } catch (error: any) {
-    return error.message;
+    throw new Error(error.response.data.error);
   }
 };
 
@@ -71,8 +71,12 @@ export const leaveRequestConfirmHod = async (
     const { data } = await api.put(`/faculty/approveLeaveHod/${id}`, {
       status,
     });
-    if (data.success) return data;
+    console.log(data);
+    if (data && data.success) {
+      return data;
+    } else throw new Error(data.message);
   } catch (error: any) {
-    return error.message;
+    console.log(error);
+    throw new Error(error.message);
   }
 };
