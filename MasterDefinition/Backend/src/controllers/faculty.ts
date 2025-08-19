@@ -459,20 +459,6 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
         message: ResponseMessages.ERROR.WENT_WRONG,
       });
 
-    const updateLeave = await prisma.userLeave.update({
-      where: {
-        id: userLeaveDetail.id,
-      },
-      data: {
-        availableLeave: calculatedData.availableLeave,
-        usedLeave: calculatedData.usedLeave,
-        totalWorkingDays: calculatedData.totalWorkingDays,
-        attendancePercentage: calculatedData.attendancePercentage,
-      },
-    });
-
-    if (!updateLeave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
-
     const getFacultyLeaves = await prisma.leaveRequest.findMany({
       where: {
         requestToId: userId,
@@ -507,10 +493,31 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
       },
     });
 
+    if (status === "Rejected")
+      return res.status(200).json({
+        success: true,
+        message: ResponseMessages.LEAVE.UPDATED,
+        studentLeaves: getStudentLeaves,
+        facultyLeaves: getFacultyLeaves,
+      });
+
+    const updateLeave = await prisma.userLeave.update({
+      where: {
+        id: userLeaveDetail.id,
+      },
+      data: {
+        availableLeave: calculatedData.availableLeave,
+        usedLeave: calculatedData.usedLeave,
+        totalWorkingDays: calculatedData.totalWorkingDays,
+        attendancePercentage: calculatedData.attendancePercentage,
+      },
+    });
+
+    if (!updateLeave) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
     return res.status(200).json({
       success: true,
       message: ResponseMessages.LEAVE.UPDATED,
-      error: "Hello world",
       studentLeaves: getStudentLeaves,
       facultyLeaves: getFacultyLeaves,
     });

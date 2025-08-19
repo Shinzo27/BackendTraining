@@ -4,18 +4,10 @@ import Faculty from "@/components/Faculty";
 import Hod from "@/components/Hod";
 import Student from "@/components/Student";
 import { useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 const Page = () => {
   const { data: session } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!session?.user) {
-      return router.push("/");
-    }
-  }, [router, session]);
 
   return session?.user?.role === 1 ? (
     <Admin />

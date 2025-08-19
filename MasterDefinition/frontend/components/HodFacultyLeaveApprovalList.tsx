@@ -36,7 +36,7 @@ const HodFacultyLeaveApprovalList = ({
     }
   };
   return (
-    <div className="bg-neutral-800 p-10 rounded-2xllg:min-w-[800px] min-w-[200px] flex items-center justify-center flex-col">
+    <div className="bg-neutral-800 p-10 rounded-2xl lg:min-w-[800px] min-w-[200px] flex items-center justify-center flex-col">
       <div className="w-full flex items-start justify-center     flex-col">
         <h1 className="font-bold text-2xl">Facaulty Leave Approval</h1>
         <h1 className="font-light text-sm">All requested leave list</h1>
@@ -50,7 +50,9 @@ const HodFacultyLeaveApprovalList = ({
             >
               <div className="flex items-center justify-between gap-5">
                 <div className="flex flex-col justify-center">
-                  <p className="sm:w-72 w-20 font-semibold truncate">{leave.reason}</p>
+                  <p className="sm:w-72 w-20 font-semibold truncate">
+                    {leave.reason}
+                  </p>
                   <p className="font-light text-xs">
                     Applied By - {leave.user.name}
                   </p>

@@ -21,7 +21,6 @@ const Admin = () => {
   useEffect(() => {
     async function getData() {
       const { data } = await api.get("/admin/getLeaveReport");
-      console.log(data);
       setAdminData(data.leaveData);
     }
     getData();
@@ -41,38 +40,38 @@ const Admin = () => {
               className="data-[state=active]:bg-neutral-900 data-[state=active]:text-white"
               value="students"
             >
-              <ManageStudent />
+              Manage Student
             </TabsTrigger>
             <TabsTrigger
               className="data-[state=active]:bg-neutral-900 data-[state=active]:text-white"
               value="faculties"
             >
-              <ManageFaculties />
+              Manage Faculty
             </TabsTrigger>
             <TabsTrigger
               className="data-[state=active]:bg-neutral-900 data-[state=active]:text-white"
               value="hods"
             >
-              <ManageHods />
+              Manage HODs
             </TabsTrigger>
             <TabsTrigger
               className="data-[state=active]:bg-neutral-900 data-[state=active]:text-white"
               value="staticData"
             >
-              <ManageStaticData />
+              Manage Static Data
             </TabsTrigger>
           </TabsList>
           <TabsContent value="students">
-            <h1>Students</h1>
+            <ManageStudent />
           </TabsContent>
           <TabsContent value="faculties">
-            <h1>Faculties</h1>
+            <ManageFaculties />
           </TabsContent>
           <TabsContent value="hods">
-            <h1>Hods</h1>
+            <ManageHods />
           </TabsContent>
           <TabsContent value="staticData">
-            <h1>Static Data</h1>
+            <ManageStaticData />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,65 +1,55 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { IUpdateUserData, updateUserData } from "@/lib/Types";
+import { Formik } from "formik";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Input } from "../ui/input";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { registerInitialValue, registerValidations } from "@/lib/Types";
-import { Formik } from "formik";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { registerStudentService } from "@/services/authServices";
+} from "../ui/select";
+import { Button } from "../ui/button";
+import { updateUser } from "@/services/AdminManagement";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const Page = () => {
-  const [departments, setDepartments] = useState([]);
-  const [file, setFile] = useState<File | null>(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      const { data } = await axios.get(
-        "http://localhost:8000/api/statics/getDepartments",
-        { withCredentials: true }
-      );
-      setDepartments(data.department);
-    }
-    fetchData();
-  }, []);
-
-  const handleUpdateFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-
-    setFile(e.target.files[0]);
-  };
+const UpdateUserDetails = ({
+  departments,
+  userData,
+}: {
+  departments: { department: string }[];
+  userData: IUpdateUserData;
+}) => {
   const router = useRouter();
-
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-20">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">
-        <Link href={"/"} className="flex items-start justify-start w-full">
+        <Link
+          href={"/dashboard"}
+          className="flex items-start justify-start w-full"
+        >
           <ArrowLeft />
         </Link>
         <div className=" flex items-center justify-center flex-col text-xl font-bold">
-          <p className="">Register</p>
+          <p className="">Update User</p>
           <p className="text-sm pt-3 font-light">Enter details correctly!</p>
         </div>
         <Formik
-          initialValues={registerInitialValue}
-          validationSchema={registerValidations}
+          initialValues={{ ...userData }}
+          validationSchema={updateUserData}
           onSubmit={async (values) => {
-            if (!file) return toast.error("Select correct file");
-            await registerStudentService(values, file, "4");
-            router.push("/login");
+            const updateData = await updateUser(values);
+            if (updateData.success) {
+              toast.success(updateData.message);
+              router.push("/dashboard");
+            } else {
+              toast.error("Something went wrong!");
+            }
           }}
           className="flex flex-col items-center justify-center gap-7"
         >
@@ -84,10 +74,10 @@ const Page = () => {
                     placeholder="Enter your name"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.name}
+                    defaultValue={values.name}
                     className="px-4 py-6"
                   />
-                  {errors.name && touched.name && errors.name}
+                  <h1>{errors.name && touched.name && errors.name}</h1>
                 </div>
                 <div className="flex items-center justify-center flex-col gap-3">
                   <Input
@@ -96,7 +86,7 @@ const Page = () => {
                     placeholder="Enter your email"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.email}
+                    defaultValue={values.email}
                     className="px-4 py-6"
                   />
                   {errors.email && touched.email && errors.email}
@@ -105,24 +95,12 @@ const Page = () => {
               <div className="flex items-center justify-center gap-5">
                 <div className="flex items-center justify-center flex-col gap-3">
                   <Input
-                    type="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.password}
-                    className="px-4 py-6"
-                  />
-                  {errors.password && touched.password && errors.password}
-                </div>
-                <div className="flex items-center justify-center flex-col gap-3">
-                  <Input
                     type="string"
                     name="gr_number"
                     placeholder="Enter your gr_number"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.gr_number}
+                    defaultValue={values.gr_number}
                     className="px-4 py-6"
                   />
                   {errors.gr_number && touched.gr_number && errors.gr_number}
@@ -136,7 +114,7 @@ const Page = () => {
                     placeholder="Enter your contact"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.phone}
+                    defaultValue={values.phone}
                     className="px-4 py-6"
                   />
                   {errors.phone && touched.phone && errors.phone}
@@ -148,7 +126,7 @@ const Page = () => {
                     placeholder="Enter your address"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.address}
+                    defaultValue={values.address}
                     className="px-4 py-6"
                   />
                   {errors.address && touched.address && errors.address}
@@ -222,36 +200,20 @@ const Page = () => {
                   {errors.className && touched.className && errors.className}
                 </div>
               </div>
-              <div className="flex items-center justify-center flex-col gap-3">
-                <Label htmlFor="picture">Profile Picture</Label>
-                <Input
-                  id="picture"
-                  type="file"
-                  name="image"
-                  onChange={(e) => handleUpdateFile(e)}
-                  required
-                />
-              </div>
               <div>
                 <Button
                   type="submit"
                   className="px-7 py-6 bg-neutral-950 font-bold text-lg"
                 >
-                  Register
+                  Update User
                 </Button>
               </div>
             </form>
           )}
         </Formik>
-        <div className="font-light">
-          Already Logged In?{" "}
-          <Link href={"/login"} className="font-bold">
-            Login here
-          </Link>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Page;
+export default UpdateUserDetails;

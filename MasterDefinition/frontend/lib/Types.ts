@@ -146,3 +146,81 @@ export interface IAdminData {
   approvalPercentage: number;
   totalRequest: number;
 }
+
+export interface IUserDetail {
+  name: string;
+  email: string;
+  department: string;
+  id: string;
+}
+
+export interface IStaticData {
+  id: number;
+  department: string;
+  class: string;
+  academicYear: string;
+  totalLeave: number;
+  totalWorkingDays: number;
+}
+
+export interface IDataCard {
+  title: string;
+  data: number;
+  subtitle: string;
+  fontColor: string;
+}
+
+export const updateUserData = Yup.object({
+  name: Yup.string().required("Required!"),
+  email: Yup.string().email().required("Required!"),
+  gender: Yup.string().required("Required!"),
+  address: Yup.string().required("Required!"),
+  className: Yup.string().required("Required!"),
+  department: Yup.string().required("Required!"),
+  phone: Yup.string().required("Required!"),
+  gr_number: Yup.string().required("Required"),
+});
+
+export interface IUpdateUserData {
+  name: string;
+  id: string;
+  email: string;
+  gender: string;
+  address: string;
+  className: string;
+  department: string;
+  phone: string;
+  roleId: number;
+  gr_number: string;
+}
+
+export const staticDataValidations = Yup.object({
+  department: Yup.string().required("Required"),
+  className: Yup.string().required("Required"),
+  academicYear: Yup.string().required("Required"),
+  totalLeave: Yup.number()
+    .integer()
+    .required("Required")
+    .typeError("Only number allowed!"),
+  totalWorkingDays: Yup.number()
+    .integer()
+    .required("Required")
+    .typeError("Only number allowed!"),
+});
+
+export interface IAddStaticData {
+  department: string;
+  className: string;
+  academicYear: string;
+  totalLeave: number;
+  totalWorkingDays: number;
+}
+
+export interface IUpdateStaticData {
+  id: number,
+  department: string;
+  className: string;
+  academicYear: string;
+  totalLeave: number;
+  totalWorkingDays: number;
+}

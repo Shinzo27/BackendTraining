@@ -22,7 +22,7 @@ export const updateUserSchema = Joi.object({
   address: Joi.string().required(),
   department: Joi.string().optional(),
   className: Joi.string().optional(),
-  roleId: Joi.string().required(),
+  roleId: Joi.number().integer().required(),
 });
 
 export const signInSchema = Joi.object({

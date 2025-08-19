@@ -7,7 +7,8 @@ import { DefaultSession } from "next-auth";
 
 export const registerStudentService = async (
   values: registerStudent,
-  file: File
+  file: File,
+  roleId: string
 ) => {
   try {
     const formData = new FormData();
@@ -21,7 +22,7 @@ export const registerStudentService = async (
     formData.append("address", values.address);
     formData.append("department", values.department);
     formData.append("className", values.className);
-    formData.append("roleId", "4");
+    formData.append("roleId", roleId);
     formData.append("image", file, file.name);
 
     const object = Object.fromEntries(formData.entries());
@@ -75,7 +76,8 @@ export const NEXT_AUTH = {
       },
       async authorize(credentials: any) {
         try {
-          if (!credentials.email || !credentials.name) throw new Error("Credentials not found!");
+          if (!credentials.email || !credentials.name)
+            throw new Error("Credentials not found!");
 
           return {
             id: credentials.id,

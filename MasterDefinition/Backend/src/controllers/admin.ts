@@ -40,15 +40,19 @@ export const getLeaveReport = async (req: Request, res: Response) => {
     });
 
     const leaveCount = await prisma.leaveRequest.count();
+    let approvalPercentage;
+    if (leaveCount) {
+      approvalPercentage = await prisma.leaveRequest.groupBy({
+        by: ["status"],
+        _count: {
+          id: true,
+        },
+      });
+    }
 
-    const approvalPercentage = await prisma.leaveRequest.groupBy({
-      by: ["status"],
-      _count: {
-        id: true,
-      },
-    });
-
-    const percentage = (approvalPercentage[1]._count.id * 100) / leaveCount;
+    const percentage = approvalPercentage
+      ? (approvalPercentage[1]._count.id * 100) / leaveCount
+      : 0;
 
     const leaveData = {
       totalUser: totalUser,
@@ -61,6 +65,138 @@ export const getLeaveReport = async (req: Request, res: Response) => {
       success: true,
       message: ResponseMessages.ADMIN.LEAVEREPORT,
       leaveData: leaveData,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
+
+    const deleteUserDetails = await prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    const userType = deleteUserDetails.roleId;
+
+    if (!deleteUserDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    const users = await prisma.user.findMany({
+      where: {
+        roleId: userType,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.USER.DELETED,
+      users: users,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.meta.cause,
+    });
+  }
+};
+
+export const updateUserDetails = async (req: Request, res: Response) => {
+  try {
+    await updateUserSchema.validateAsync(req.body);
+
+    const {
+      name,
+      email,
+      gender,
+      gr_number,
+      phone,
+      address,
+      department,
+      className,
+      roleId,
+    } = req.body;
+    const { id } = req.params;
+
+    const updateUser = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        email,
+        gender,
+        gr_number,
+        phone,
+        address,
+        department,
+        class: className,
+        roleId: Number(roleId),
+      },
+    });
+
+    if (!updateUser) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.STUDENT.DETAILS_UPDATED,
+    });
+  } catch (error: any) {
+    if (error.isJoi) {
+      return res.status(404).json({
+        sucess: false,
+        message: ResponseMessages.ERROR.VALIDATION_ERROR,
+        error: error.details,
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.meta.cause,
+    });
+  }
+};
+
+export const getUserDataById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
+
+    const userDetails = await prisma.user.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        address: true,
+        class: true,
+        department: true,
+        email: true,
+        name: true,
+        gender: true,
+        id: true,
+        phone: true,
+        roleId: true,
+        gr_number: true,
+      },
+    });
+
+    if (!userDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.STUDENT.DETAILS_FETCHED,
+      data: { ...userDetails, className: userDetails.class },
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -89,8 +225,8 @@ export const createStaticData = async (req: Request, res: Response) => {
         department,
         class: className,
         academicYear,
-        totalLeave,
-        totalWorkingDays,
+        totalLeave: Number(totalLeave),
+        totalWorkingDays: Number(totalWorkingDays),
       },
     });
 
@@ -197,7 +333,7 @@ export const getStaticDataById = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: ResponseMessages.STATICDATA.FETCHED,
-      data: staticData,
+      data: { ...staticData, className: staticData.class },
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -211,16 +347,15 @@ export const getStaticDataById = async (req: Request, res: Response) => {
 //Manage Student
 export const getStudentList = async (req: Request, res: Response) => {
   try {
-    const { department, className } = req.params;
-
-    if (!department || !className)
-      throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
-
     const studentList = await prisma.user.findMany({
       where: {
-        department,
-        class: className,
         roleId: 4,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
       },
     });
 
@@ -230,35 +365,6 @@ export const getStudentList = async (req: Request, res: Response) => {
       success: true,
       message: ResponseMessages.STUDENT.DETAILS_FETCHED,
       data: studentList,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
-export const getStudentDetailsById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
-
-    const studentDetails = await prisma.user.findFirst({
-      where: {
-        id,
-        roleId: 4,
-      },
-    });
-
-    if (!studentDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.STUDENT.DETAILS_FETCHED,
-      data: studentDetails,
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -297,91 +403,6 @@ export const getStudentLeaveDetails = async (req: Request, res: Response) => {
   }
 };
 
-export const updateStudentDetails = async (req: Request, res: Response) => {
-  try {
-    await updateUserSchema.validateAsync(req.body);
-
-    const {
-      name,
-      email,
-      gender,
-      gr_number,
-      phone,
-      address,
-      department,
-      className,
-      roleId,
-    } = req.body;
-    const { id } = req.params;
-
-    const updateUser = await prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-        email,
-        gender,
-        gr_number,
-        phone,
-        address,
-        department,
-        class: className,
-        roleId: Number(roleId),
-      },
-    });
-
-    if (!updateUser) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.STUDENT.DETAILS_UPDATED,
-    });
-  } catch (error: any) {
-    if (error.isJoi) {
-      return res.status(404).json({
-        sucess: false,
-        message: ResponseMessages.ERROR.VALIDATION_ERROR,
-        error: error.details,
-      });
-    }
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause,
-    });
-  }
-};
-
-export const deleteStudent = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
-
-    const deleteStudentDetails = await prisma.user.delete({
-      where: {
-        id,
-        roleId: 4,
-      },
-    });
-
-    if (!deleteStudentDetails)
-      throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.STUDENT.DELETED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause,
-    });
-  }
-};
-
 //Manage HOD
 
 export const getHodDetails = async (req: Request, res: Response) => {
@@ -390,6 +411,12 @@ export const getHodDetails = async (req: Request, res: Response) => {
       where: {
         roleId: 2,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
+      },
     });
 
     return res.status(200).json({
@@ -402,111 +429,6 @@ export const getHodDetails = async (req: Request, res: Response) => {
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
-    });
-  }
-};
-
-export const getHodDetailsById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const hodDetails = await prisma.user.findFirst({
-      where: {
-        id,
-        roleId: 2,
-      },
-    });
-
-    if (!hodDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.ADMIN.HODDETAILS,
-      data: hodDetails,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
-export const updateHodDetails = async (req: Request, res: Response) => {
-  try {
-    await updateUserSchema.validateAsync(req.body);
-    const { id } = req.params;
-
-    const {
-      name,
-      email,
-      gender,
-      gr_number,
-      phone,
-      address,
-      department,
-      className,
-      roleId,
-    } = req.body;
-
-    const updateHod = await prisma.user.update({
-      where: {
-        id,
-        roleId: 2,
-      },
-      data: {
-        name,
-        email,
-        gender,
-        gr_number: gr_number && gr_number,
-        phone,
-        address,
-        department,
-        class: className,
-        roleId: Number(roleId),
-      },
-    });
-
-    if (!updateHod) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.HOD.UPDATED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause,
-    });
-  }
-};
-
-export const deleteHod = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
-
-    const deleteHodDetails = await prisma.user.delete({
-      where: {
-        id,
-        roleId: 2,
-      },
-    });
-
-    if (!deleteHodDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.HOD.DELETED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause,
     });
   }
 };
@@ -519,245 +441,24 @@ export const getFacultyDetails = async (req: Request, res: Response) => {
       where: {
         roleId: 3,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
+      },
     });
 
     return res.status(200).json({
       success: true,
       message: ResponseMessages.FACULTY.FETCHED,
-      facultyDetails,
+      data: facultyDetails,
     });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
       message: ResponseMessages.ERROR.WENT_WRONG,
       error: error.message,
-    });
-  }
-};
-
-export const getFacultyDetailsById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const facultyDetails = await prisma.user.findFirst({
-      where: {
-        roleId: 3,
-        id,
-      },
-    });
-
-    if (!facultyDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.FACULTY.FETCHED,
-      facultyDetails,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
-export const updateFaculty = async (req: Request, res: Response) => {
-  try {
-    await updateUserSchema.validateAsync(req.body);
-
-    const { id } = req.params;
-    const {
-      name,
-      email,
-      gender,
-      gr_number,
-      phone,
-      address,
-      department,
-      className,
-      roleId,
-    } = req.body;
-
-    const updateData = await prisma.user.update({
-      where: {
-        id,
-        roleId: 3,
-      },
-      data: {
-        name,
-        email,
-        gender,
-        gr_number: gr_number && gr_number,
-        phone,
-        address,
-        department,
-        class: className,
-        roleId: Number(roleId),
-      },
-    });
-
-    if (!updateData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.FACULTY.UPDATED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause ? error.meta.cause : error.message,
-    });
-  }
-};
-
-export const deleteFaculty = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const deleteData = await prisma.user.delete({
-      where: {
-        id,
-      },
-    });
-
-    if (!deleteData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.FACULTY.DELETED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.meta.cause ? error.meta.cause : error.message,
-    });
-  }
-};
-
-// Manage Employee
-
-export const getEmployeesDetails = async (req: Request, res: Response) => {
-  try {
-    const employeesData = await prisma.user.findMany({
-      where: {
-        roleId: 5,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.EMPLOYEE.FETCHED,
-      data: employeesData,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
-export const getEmployeeById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const employeeDetail = await prisma.user.findFirst({
-      where: {
-        id,
-      },
-    });
-
-    if (!employeeDetail) throw new Error("Employee not found!");
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.EMPLOYEE.FETCHED,
-      data: employeeDetail,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
-export const updateEmployee = async (req: Request, res: Response) => {
-  try {
-    await updateUserSchema.validateAsync(req.body);
-    const { id } = req.params;
-
-    const {
-      name,
-      email,
-      gender,
-      gr_number,
-      phone,
-      address,
-      department,
-      className,
-      roleId,
-    } = req.body;
-
-    const updateData = await prisma.user.update({
-      where: {
-        id,
-        roleId: 5,
-      },
-      data: {
-        name,
-        email,
-        gender,
-        gr_number: gr_number && gr_number,
-        phone,
-        address,
-        department,
-        class: className,
-        roleId: Number(roleId),
-      },
-    });
-
-    if (!updateData) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.EMPLOYEE.UPDATED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
-export const deleteEmployee = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const deleteData = await prisma.user.delete({
-      where: {
-        id,
-      },
-    });
-
-    if (!deleteData) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.EMPLOYEE.DELETED,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.messsage ? error.message : error.meta.cause,
     });
   }
 };

@@ -1,15 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useSession } from "next-auth/react";
 import FacultyLeaveData from "./FacultyLeaveData";
 import FacultyLeaveForm from "./FacultyLeaveForm";
 import FacultyLeaveHistory from "./FacultyLeaveHistory";
-import { useState } from "react";
-import { Leave } from "@/lib/Types";
+import { useEffect, useState } from "react";
+import { IFacultyLeaveData, Leave } from "@/lib/Types";
 import FacultyLeaveApprovalList from "./FacultyLeaveApprovalList";
+import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 const Faculty = () => {
   const { data: session } = useSession();
   const [leaves, setLeaves] = useState<Leave[] | []>([]);
   const [totalApplication, setTotalApplication] = useState(0);
+  const [facultyData, setFacultyData] = useState<
+    IFacultyLeaveData | undefined
+  >();
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const { data } = await api.get("/faculty/getFacultLeaveBalance");
+        if (data.success) {
+          setFacultyData(data.facultyData);
+        }
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    }
+    getData();
+  }, []);
 
   return (
     <div className="mb-10">
@@ -17,7 +37,10 @@ const Faculty = () => {
         <h1 className="font-bold text-2xl">Faculty Dashboard</h1>
         <p>Welcome back, {session?.user.name}</p>
       </div>
-      <FacultyLeaveData totalApplication={totalApplication} />
+      <FacultyLeaveData
+        totalApplication={totalApplication}
+        facultyData={facultyData as IFacultyLeaveData}
+      />
       <div className="flex lg:items-start items-center justify-center gap-20 mt-10 lg:flex-row flex-col">
         <FacultyLeaveForm
           setLeaves={setLeaves}

@@ -21,7 +21,7 @@ import { registerStudentService } from "@/services/authServices";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const Page = () => {
+const AddUserDetails = ({ roleId }: { roleId: number }) => {
   const [departments, setDepartments] = useState([]);
   const [file, setFile] = useState<File | null>(null);
 
@@ -42,15 +42,17 @@ const Page = () => {
     setFile(e.target.files[0]);
   };
   const router = useRouter();
-
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-20">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">
-        <Link href={"/"} className="flex items-start justify-start w-full">
+        <Link
+          href={"/dashboard"}
+          className="flex items-start justify-start w-full"
+        >
           <ArrowLeft />
         </Link>
         <div className=" flex items-center justify-center flex-col text-xl font-bold">
-          <p className="">Register</p>
+          <p className="">Add User</p>
           <p className="text-sm pt-3 font-light">Enter details correctly!</p>
         </div>
         <Formik
@@ -58,8 +60,8 @@ const Page = () => {
           validationSchema={registerValidations}
           onSubmit={async (values) => {
             if (!file) return toast.error("Select correct file");
-            await registerStudentService(values, file, "4");
-            router.push("/login");
+            await registerStudentService(values, file, roleId.toString());
+            router.push("/dashboard");
           }}
           className="flex flex-col items-center justify-center gap-7"
         >
@@ -237,21 +239,15 @@ const Page = () => {
                   type="submit"
                   className="px-7 py-6 bg-neutral-950 font-bold text-lg"
                 >
-                  Register
+                  Add User
                 </Button>
               </div>
             </form>
           )}
         </Formik>
-        <div className="font-light">
-          Already Logged In?{" "}
-          <Link href={"/login"} className="font-bold">
-            Login here
-          </Link>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Page;
+export default AddUserDetails;
