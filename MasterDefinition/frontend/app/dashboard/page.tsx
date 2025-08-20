@@ -1,10 +1,10 @@
 "use client";
-import Admin from "@/components/Admin";
-import Faculty from "@/components/Faculty";
-import Hod from "@/components/Hod";
-import Student from "@/components/Student";
+import Admin from "@/components/Admin/Admin";
+import Faculty from "@/components/Faculty/Faculty";
+import Hod from "@/components/Hod/Hod";
+import Loader from "@/components/Loader";
+import Student from "@/components/Student/Student";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 
 const Page = () => {
   const { data: session } = useSession();
@@ -18,7 +18,7 @@ const Page = () => {
   ) : session?.user?.role === 4 ? (
     <Student />
   ) : (
-    redirect("/")
+    <Loader />
   );
 };
 

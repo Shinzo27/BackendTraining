@@ -5,6 +5,7 @@ import { IStaticData } from "@/lib/Types";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const ManageStaticData = () => {
   const [staticData, setStaticData] = useState<IStaticData[] | []>([]);
@@ -30,7 +31,9 @@ const ManageStaticData = () => {
           </p>
         </div>
         <div>
-          <Button className="bg-amber-600">Add Static Data</Button>
+          <Button className="bg-amber-600">
+            <Link href={"/addStaticData"}>Add Static Data</Link>
+          </Button>
         </div>
       </div>
       <div>

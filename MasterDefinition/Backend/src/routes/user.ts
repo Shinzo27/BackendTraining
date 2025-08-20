@@ -7,9 +7,8 @@ import {
   userRegister,
   verifyOtp,
 } from "../controllers/user";
-import { checkAuthorization, checkRegisterUser } from "../middlewares/auth";
+import { checkRegisterUser } from "../middlewares/auth";
 import { upload } from "../lib/upload";
-import { getFacultyOfDepartment } from "../controllers/student";
 
 const router = Router();
 
@@ -19,6 +18,5 @@ router.get("/logout", logout);
 router.post("/sendOtp", sendOtp);
 router.post("/verifyOtp", verifyOtp);
 router.post("/resetPassword", resetPassword);
-
 
 export default router;

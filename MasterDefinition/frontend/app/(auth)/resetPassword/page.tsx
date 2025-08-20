@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
-import { resetPasswordValidation } from "@/lib/Types";
-import axios from "axios";
+import { resetPasswordValidation } from "@/lib/Validations";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const Page = () => {
   const router = useRouter();
@@ -28,9 +28,11 @@ const Page = () => {
           validationSchema={resetPasswordValidation}
           onSubmit={async (values) => {
             try {
-              const { data } = await axios.post(
-                "http://localhost:8000/api/users/resetPassword",
-                { password: values.password },
+              if (values.password != values.confirmPassword)
+                return toast.error("Password didn't match!");
+              const { data } = await api.post(
+                "/users/resetPassword",
+                { password: values.password.trim() },
                 { withCredentials: true }
               );
               if (data.success) {

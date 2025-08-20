@@ -47,6 +47,7 @@ export const leaveSchema = Joi.object({
 });
 
 export const staticDataSchema = Joi.object({
+  id: Joi.number().integer().required(),
   department: Joi.string().required(),
   className: Joi.string().required(),
   academicYear: Joi.string().required(),

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
-import { staticDataValidations } from "@/lib/Types";
+import { staticDataValidations } from "@/lib/Validations";
 import toast from "react-hot-toast";
 import { updateStaticData } from "@/services/AdminManagement";
 import { useRouter } from "next/navigation";

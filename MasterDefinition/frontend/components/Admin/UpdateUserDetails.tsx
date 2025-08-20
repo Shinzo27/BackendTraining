@@ -1,5 +1,6 @@
 "use client";
-import { IUpdateUserData, updateUserData } from "@/lib/Types";
+import { IUpdateUserData } from "@/lib/Types";
+import { updateUserData } from "@/lib/Validations";
 import { Formik } from "formik";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

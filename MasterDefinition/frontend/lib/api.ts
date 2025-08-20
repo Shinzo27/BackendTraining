@@ -12,7 +12,6 @@ export const login = async (email: string, password: string) => {
     const { data } = await api.post("/users/signin", { email, password });
     if (data.success) return data;
   } catch (error: any) {
-    console.log(error);
     throw new Error(error.response.data.error);
   }
 };
@@ -20,11 +19,11 @@ export const login = async (email: string, password: string) => {
 export const studentLeaveApply = async (values: leaveValidation) => {
   try {
     const { data } = await api.post("/student/applyStudentLeave", {
-      startDate: values.startDate,
-      endDate: values.endDate,
-      leaveType: values.leaveType,
-      requestToId: values.requestToId,
-      reason: values.reason,
+      startDate: values.startDate.trim(),
+      endDate: values.endDate.trim(),
+      leaveType: values.leaveType.trim(),
+      requestToId: values.requestToId.trim(),
+      reason: values.reason.trim(),
       status: "Pending",
     });
 
@@ -49,11 +48,11 @@ export const leaveRequestConfirm = async (
 export const facultyLeaveApply = async (values: leaveValidation) => {
   try {
     const { data } = await api.post("/faculty/applyFacultyLeave", {
-      startDate: values.startDate,
-      endDate: values.endDate,
-      leaveType: values.leaveType,
-      requestToId: values.requestToId,
-      reason: values.reason,
+      startDate: values.startDate.trim(),
+      endDate: values.endDate.trim(),
+      leaveType: values.leaveType.trim(),
+      requestToId: values.requestToId.trim(),
+      reason: values.reason.trim(),
       status: "Pending",
     });
 
@@ -71,12 +70,10 @@ export const leaveRequestConfirmHod = async (
     const { data } = await api.put(`/faculty/approveLeaveHod/${id}`, {
       status,
     });
-    console.log(data);
     if (data && data.success) {
       return data;
     } else throw new Error(data.message);
   } catch (error: any) {
-    console.log(error);
     throw new Error(error.message);
   }
 };

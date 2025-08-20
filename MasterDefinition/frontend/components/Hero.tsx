@@ -17,7 +17,7 @@ const Hero = () => {
   return (
     <div className="h-screen text-white flex items-center justify-center flex-col gap-5">
       <p className="text-4xl font-bold">Welcome to LMS.</p>
-
+      <p>Manage your leaves at one place!</p>
       <Link
         href={"/login"}
         className="bg-neutral-700 px-6 py-3 font-bold rounded-lg"

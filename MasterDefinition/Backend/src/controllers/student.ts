@@ -4,46 +4,6 @@ import { ResponseMessages } from "../lib/responseMessage";
 import { leaveSchema } from "../lib/validationSchema";
 import { checkRequestToUser, checkValidDaysLeave } from "../lib/checks";
 
-export const getStudentDetails = async (req: Request, res: Response) => {
-  try {
-    const user = req.user?.email;
-
-    const studentDetails = await prisma.user.findFirst({
-      where: {
-        email: user,
-        roleId: 4,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        gender: true,
-        image: true,
-        gr_number: true,
-        phone: true,
-        address: true,
-        department: true,
-        class: true,
-        roleId: true,
-      },
-    });
-
-    if (!studentDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.STUDENT.DETAILS_FETCHED,
-      details: studentDetails,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
 export const applyStudentLeave = async (req: Request, res: Response) => {
   try {
     await leaveSchema.validateAsync(req.body);
@@ -94,7 +54,6 @@ export const applyStudentLeave = async (req: Request, res: Response) => {
       leaves: leaveList,
     });
   } catch (error: any) {
-    console.log(error);
     if (error.isJoi) {
       return res.status(404).json({
         success: false,

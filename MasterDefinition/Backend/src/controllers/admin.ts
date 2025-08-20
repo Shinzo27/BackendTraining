@@ -4,31 +4,6 @@ import { ResponseMessages } from "../lib/responseMessage";
 import { staticDataSchema, updateUserSchema } from "../lib/validationSchema";
 
 // Leave Data
-export const getLeaveList = async (req: Request, res: Response) => {
-  try {
-    const leaveList = await prisma.leaveRequest.findMany({
-      include: {
-        requestTo: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.ADMIN.LEAVELIST,
-      data: leaveList,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error,
-    });
-  }
-};
-
 export const getLeaveReport = async (req: Request, res: Response) => {
   try {
     const totalUser = await prisma.user.count({});
@@ -40,24 +15,21 @@ export const getLeaveReport = async (req: Request, res: Response) => {
     });
 
     const leaveCount = await prisma.leaveRequest.count();
-    let approvalPercentage;
-    if (leaveCount) {
-      approvalPercentage = await prisma.leaveRequest.groupBy({
-        by: ["status"],
-        _count: {
-          id: true,
-        },
-      });
-    }
+
+    const approvalPercentage = await prisma.leaveRequest.count({
+      where: {
+        status: "Approved",
+      },
+    });
 
     const percentage = approvalPercentage
-      ? (approvalPercentage[1]._count.id * 100) / leaveCount
+      ? (approvalPercentage * 100) / leaveCount
       : 0;
 
     const leaveData = {
       totalUser: totalUser,
       pendingLeaves: pendingLeaves,
-      approvalPercentage: percentage,
+      approvalPercentage: percentage.toFixed(2),
       totalRequest: leaveCount,
     };
 
@@ -75,6 +47,142 @@ export const getLeaveReport = async (req: Request, res: Response) => {
   }
 };
 
+export const getLeaveReportData = async (req: Request, res: Response) => {
+  try {
+    const topStudentCount = await prisma.leaveRequest.groupBy({
+      by: ["userId"],
+      where: {
+        user: {
+          roleId: 4,
+        },
+      },
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: "desc",
+        },
+      },
+      take: 10,
+    });
+
+    const studentDetails = await Promise.all(
+      topStudentCount.map(async (user) => {
+        const userDetails = await prisma.user.findFirst({
+          where: {
+            id: user.userId,
+          },
+          select: {
+            id: true,
+            name: true,
+            department: true,
+          },
+        });
+        return {
+          id: userDetails?.id,
+          name: userDetails?.name,
+          count: user._count.id,
+          department: userDetails?.department,
+        };
+      })
+    );
+
+    const topFacultyCount = await prisma.leaveRequest.groupBy({
+      by: ["userId"],
+      where: {
+        user: {
+          roleId: 3,
+        },
+      },
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: "desc",
+        },
+      },
+      take: 10,
+    });
+
+    const facultyDetails = await Promise.all(
+      topFacultyCount.map(async (user) => {
+        const userDetails = await prisma.user.findFirst({
+          where: {
+            id: user.userId,
+          },
+          select: {
+            id: true,
+            name: true,
+            department: true,
+          },
+        });
+        return {
+          id: userDetails?.id,
+          name: userDetails?.name,
+          count: user._count.id,
+          department: userDetails?.department,
+        };
+      })
+    );
+
+    const belowPercentageAttendance = await prisma.userLeave.findMany({
+      where: {
+        attendancePercentage: {
+          lte: 75,
+        },
+      },
+      select: {
+        attendancePercentage: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            department: true,
+          },
+        },
+      },
+    });
+
+    const pendingLeaves = await prisma.leaveRequest.findMany({
+      where: {
+        status: "Pending",
+      },
+      select: {
+        id: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        requestTo: {
+          select: {
+            name: true,
+          },
+        },
+        reason: true,
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: ResponseMessages.LEAVE.FETCHED,
+      facultyDetails: facultyDetails,
+      studentDetails: studentDetails,
+      belowPercentageAttendance: belowPercentageAttendance,
+      pendingLeaves: pendingLeaves,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
+// User
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -291,8 +399,8 @@ export const updateStaticData = async (req: Request, res: Response) => {
         department,
         class: className,
         academicYear,
-        totalLeave,
-        totalWorkingDays,
+        totalLeave: Number(totalLeave),
+        totalWorkingDays: Number(totalWorkingDays),
       },
     });
 
@@ -375,36 +483,7 @@ export const getStudentList = async (req: Request, res: Response) => {
   }
 };
 
-export const getStudentLeaveDetails = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) throw new Error(ResponseMessages.ERROR.BAD_REQUEST);
-
-    const leaveDetails = await prisma.userLeave.findFirst({
-      where: {
-        userId: id,
-      },
-    });
-
-    if (!leaveDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
-
-    return res.status(200).json({
-      success: true,
-      message: ResponseMessages.LEAVE.FETCHED,
-      leaveDetails: leaveDetails,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: ResponseMessages.ERROR.WENT_WRONG,
-      error: error.message,
-    });
-  }
-};
-
 //Manage HOD
-
 export const getHodDetails = async (req: Request, res: Response) => {
   try {
     const hodDetails = await prisma.user.findMany({
@@ -434,7 +513,6 @@ export const getHodDetails = async (req: Request, res: Response) => {
 };
 
 // Manage Faculty
-
 export const getFacultyDetails = async (req: Request, res: Response) => {
   try {
     const facultyDetails = await prisma.user.findMany({

@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
-import { verifyOtpValidation } from "@/lib/Types";
-import axios from "axios";
+import { verifyOtpValidation } from "@/lib/Validations";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const Page = () => {
   const router = useRouter();
@@ -28,9 +28,9 @@ const Page = () => {
           validationSchema={verifyOtpValidation}
           onSubmit={async (values) => {
             try {
-              const { data } = await axios.post(
-                "http://localhost:8000/api/users/verifyOtp",
-                { email: values.email, otp: values.otp },
+              const { data } = await api.post(
+                "/users/verifyOtp",
+                { email: values.email.trim(), otp: values.otp.trim() },
                 { withCredentials: true }
               );
 

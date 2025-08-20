@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
-import { loginValidations } from "@/lib/Types";
+import { loginValidations } from "@/lib/Validations";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,10 @@ const Page = () => {
           validationSchema={loginValidations}
           onSubmit={async (values) => {
             try {
-              const signin = await login(values.email, values.password);
+              const signin = await login(
+                values.email.trim(),
+                values.password.trim()
+              );
               if (signin.success) {
                 const authSignin = await signIn("credentials", {
                   redirect: false,
@@ -46,7 +49,6 @@ const Page = () => {
                 }
               }
             } catch (error: any) {
-              console.log(error);
               toast.error(error.message);
             }
           }}

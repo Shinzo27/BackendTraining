@@ -1,19 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const { data: session } = useSession();
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       const { data } = await api.get("/users/logout");
       if (data.success) {
-        await signOut({ redirect: true });
+        await signOut({ redirect: false });
+        router.push("/");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
@@ -23,7 +29,7 @@ const Navbar = () => {
       <div className="flex items-center justify-around gap-10 text-lg ">
         {session?.user ? (
           <>
-            <Link href={"/login"} className="font-bold hidden sm:block">
+            <Link href={"/"} className="font-bold hidden sm:block">
               {session.user.name}
             </Link>
             <Button

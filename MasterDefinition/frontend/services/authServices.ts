@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { registerStudent } from "@/lib/Types";
-import axios from "axios";
 import toast from "react-hot-toast";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { DefaultSession } from "next-auth";
+import { api } from "@/lib/api";
 
 export const registerStudentService = async (
   values: registerStudent,
@@ -13,22 +13,22 @@ export const registerStudentService = async (
   try {
     const formData = new FormData();
 
-    formData.append("name", values.name);
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    formData.append("gender", values.gender);
-    formData.append("gr_number", values.gr_number);
-    formData.append("phone", values.phone);
-    formData.append("address", values.address);
-    formData.append("department", values.department);
-    formData.append("className", values.className);
+    formData.append("name", values.name.trim());
+    formData.append("email", values.email.trim());
+    formData.append("password", values.password.trim());
+    formData.append("gender", values.gender.trim());
+    formData.append("gr_number", values.gr_number.trim());
+    formData.append("phone", values.phone.trim());
+    formData.append("address", values.address.trim());
+    formData.append("department", values.department.trim());
+    formData.append("className", values.className.trim());
     formData.append("roleId", roleId);
     formData.append("image", file, file.name);
 
     const object = Object.fromEntries(formData.entries());
 
-    const { data } = await axios.post(
-      "http://localhost:8000/api/users/signup",
+    const { data } = await api.post(
+      "/users/signup",
       {
         ...object,
       },
@@ -44,8 +44,6 @@ export const registerStudentService = async (
       toast.success(data.message);
     }
   } catch (error: any) {
-    console.log(error);
-    // const errorMessage = error.message || ""
     toast.error(error.response.data.error);
   }
 };
@@ -76,7 +74,7 @@ export const NEXT_AUTH = {
       },
       async authorize(credentials: any) {
         try {
-          if (!credentials.email || !credentials.name)
+          if (!credentials.email || !credentials.name || !credentials.role)
             throw new Error("Credentials not found!");
 
           return {

@@ -30,7 +30,7 @@ const ManageStudent = () => {
           <p className="text-sm font-light">All students are mentioned here</p>
         </div>
         <div>
-          <div>
+          <div className="flex items-center gap-4">
             <Button className="bg-amber-600">
               <Link href={"/addUser/student"}>Add Student</Link>
             </Button>

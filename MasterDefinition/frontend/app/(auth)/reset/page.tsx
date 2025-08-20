@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"; 
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Formik } from "formik";
-import { resetValidations } from "@/lib/Types";
-import axios from "axios";
+import { resetValidations } from "@/lib/Validations";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const Page = () => {
   const router = useRouter();
@@ -27,12 +27,11 @@ const Page = () => {
           initialValues={{ email: "" }}
           validationSchema={resetValidations}
           onSubmit={async (values) => {
-            console.log(values);
             try {
-              const { data } = await axios.post(
-                "http://localhost:8000/api/users/sendOtp",
-                { email: values.email },
-                {withCredentials: true}
+              const { data } = await api.post(
+                "/users/sendOtp",
+                { email: values.email.trim() },
+                { withCredentials: true }
               );
               if (data.success) {
                 toast.success(data.message);
@@ -40,7 +39,6 @@ const Page = () => {
               }
               //
             } catch (error: any) {
-              console.log(error);
               toast.error(error.response.data.error);
             }
           }}

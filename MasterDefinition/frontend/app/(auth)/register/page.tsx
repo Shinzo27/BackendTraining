@@ -11,15 +11,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { registerInitialValue, registerValidations } from "@/lib/Types";
+import { registerInitialValue } from "@/lib/Types";
+import { registerValidations } from "@/lib/Validations";
 import { Formik } from "formik";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { registerStudentService } from "@/services/authServices";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const Page = () => {
   const [departments, setDepartments] = useState([]);
@@ -27,8 +28,8 @@ const Page = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const { data } = await axios.get(
-        "http://localhost:8000/api/statics/getDepartments",
+      const { data } = await api.get(
+        "/statics/getDepartments",
         { withCredentials: true }
       );
       setDepartments(data.department);

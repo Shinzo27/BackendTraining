@@ -11,26 +11,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { registerInitialValue, registerValidations } from "@/lib/Types";
+import { registerInitialValue } from "@/lib/Types";
+import { registerValidations } from "@/lib/Validations";
 import { Formik } from "formik";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { registerStudentService } from "@/services/authServices";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const AddUserDetails = ({ roleId }: { roleId: number }) => {
   const [departments, setDepartments] = useState([]);
   const [file, setFile] = useState<File | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
-      const { data } = await axios.get(
-        "http://localhost:8000/api/statics/getDepartments",
-        { withCredentials: true }
-      );
+      const { data } = await api.get("/statics/getDepartments", {
+        withCredentials: true,
+      });
       setDepartments(data.department);
     }
     fetchData();
@@ -41,7 +42,7 @@ const AddUserDetails = ({ roleId }: { roleId: number }) => {
 
     setFile(e.target.files[0]);
   };
-  const router = useRouter();
+
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-20">
       <div className="bg-neutral-800 p-10 px-20 rounded-xl flex flex-col items-center justify-center gap-7">

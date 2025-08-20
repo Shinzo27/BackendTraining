@@ -14,13 +14,11 @@ export const deleteUser = async (id: string) => {
     if (data.success) return data;
   } catch (error: any) {
     toast.error(error.message);
-    console.log(error);
   }
 };
 
 export const updateUser = async (userData: IUpdateUserData) => {
   try {
-    console.log(userData);
     const payload = {
       name: userData.name,
       email: userData.email,
@@ -39,7 +37,6 @@ export const updateUser = async (userData: IUpdateUserData) => {
     if (data.success) return data;
   } catch (error: any) {
     toast.error(error.message);
-    console.log(error);
   }
 };
 
@@ -50,17 +47,25 @@ export const addStaticData = async (staticData: IAddStaticData) => {
     });
     if (data.success) return data;
   } catch (error: any) {
-    console.log(error);
     toast.error(error.message);
   }
 };
 
 export const updateStaticData = async (staticData: IUpdateStaticData) => {
   try {
-    const { data } = await api.put(`/admin/updateStaticData/${staticData.id}`);
+    const payload = {
+      id: staticData.id,
+      department: staticData.department,
+      academicYear: staticData.academicYear,
+      totalLeave: staticData.totalLeave,
+      totalWorkingDays: staticData.totalWorkingDays,
+      className: staticData.className,
+    };
+    const { data } = await api.put(`/admin/updateStaticData/${staticData.id}`, {
+      ...payload,
+    });
     if (data.success) return data;
   } catch (error: any) {
-    console.log(error);
     toast.error(error.message);
   }
 };

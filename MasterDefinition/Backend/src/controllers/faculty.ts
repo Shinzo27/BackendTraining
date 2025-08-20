@@ -17,6 +17,14 @@ export const getLeaveStatus = async (req: Request, res: Response) => {
       where: {
         requestToId: id,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
 
     return res.status(200).json({
@@ -493,12 +501,13 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
       },
     });
 
+    const userType = leaveDetails.user.roleId === 3 ? "faculty" : "student";
+
     if (status === "Rejected")
       return res.status(200).json({
         success: true,
         message: ResponseMessages.LEAVE.UPDATED,
-        studentLeaves: getStudentLeaves,
-        facultyLeaves: getFacultyLeaves,
+        leaves: userType === "faculty" ? getFacultyLeaves : getStudentLeaves,
       });
 
     const updateLeave = await prisma.userLeave.update({
@@ -518,8 +527,7 @@ export const approveLeaveHod = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: ResponseMessages.LEAVE.UPDATED,
-      studentLeaves: getStudentLeaves,
-      facultyLeaves: getFacultyLeaves,
+      leaves: userType === "faculty" ? getFacultyLeaves : getStudentLeaves,
     });
   } catch (error) {
     return res.status(500).json({
