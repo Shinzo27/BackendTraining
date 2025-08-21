@@ -28,7 +28,7 @@ const Student = () => {
   }, []);
 
   return (
-    <div className="mb-10 ">
+    <div className="mb-20 ">
       <div className="m-5">
         <h1 className="font-bold text-2xl">Student Dashboard</h1>
         <p>Welcome back, {session?.user.name}</p>

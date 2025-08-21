@@ -27,7 +27,6 @@ const UserAppliedLeave = ({
         e.currentTarget.name as StatusType
       );
       if (updateStatus.success) {
-        console.log(updateStatus.leaves);
         toast.success(updateStatus.message);
         setUserLeaves(updateStatus.leaves);
       }

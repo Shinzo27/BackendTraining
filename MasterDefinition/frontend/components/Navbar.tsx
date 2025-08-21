@@ -29,8 +29,11 @@ const Navbar = () => {
       <div className="flex items-center justify-around gap-10 text-lg ">
         {session?.user ? (
           <>
-            <Link href={"/"} className="font-bold hidden sm:block">
+            <Link href={"/profile"} className="font-bold hidden sm:block">
               {session.user.name}
+            </Link>
+            <Link href={"/dashboard"} className="font-bold hidden sm:block">
+              Dashboard
             </Link>
             <Button
               onClick={handleLogout}

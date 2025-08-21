@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   applyFacultyLeave,
   approveLeave,
-  approveLeaveHod,
   getAllLeavesOfHod,
   getFacultLeaveBalance,
   getFacultyLeaves,
@@ -17,9 +16,7 @@ router.get("/getFacultyOfDepartment", getFacultyOfDepartment);
 router.get("/getFacultyLeaves", getFacultyLeaves);
 router.post("/applyFacultyLeave", applyFacultyLeave);
 router.get("/getFacultLeaveBalance", getFacultLeaveBalance);
-
-// Hod
+router.put("/approveLeave/:id", approveLeave);
 router.get("/getAllLeavesOfHod", getAllLeavesOfHod);
-router.put("/approveLeave/:id", approveLeaveHod);
 
 export default router;

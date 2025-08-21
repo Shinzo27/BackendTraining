@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { registerStudent } from "@/lib/Types";
-import toast from "react-hot-toast";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { DefaultSession } from "next-auth";
 import { api } from "@/lib/api";
@@ -41,10 +40,10 @@ export const registerStudentService = async (
     );
 
     if (data.success === true) {
-      toast.success(data.message);
+      return data;
     }
   } catch (error: any) {
-    toast.error(error.response.data.error);
+    return error.response.data.error;
   }
 };
 

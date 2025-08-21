@@ -3,14 +3,14 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
-export default async function LoginLayout({
+export default async function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const session = await getServerSession(NEXT_AUTH);
-  if (session?.user) {
-    return redirect("/dashboard");
+  if (!session?.user) {
+    return redirect("/");
   }
   return <div className="min-h-screen">{children}</div>;
 }

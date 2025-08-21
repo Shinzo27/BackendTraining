@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { ResponseMessages } from "../lib/responseMessage";
-import { signInSchema, signUpSchema } from "../lib/validationSchema";
+import {
+  signInSchema,
+  signUpSchema,
+  userUpdate,
+} from "../lib/validationSchema";
 import { UserLogin, UserRegister } from "../lib/types";
 import { prisma } from "../lib/prisma";
 import {
@@ -41,7 +45,7 @@ export const userRegister = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         gender,
-        image: req.file?.path || "",
+        image: `Uploads/${req.file?.filename}`,
         gr_number: gr_number && gr_number,
         phone,
         address,
@@ -72,7 +76,7 @@ export const userRegister = async (req: Request, res: Response) => {
           totalWorkingDays: staticData?.totalWorkingDays,
           attendancePercentage: 100,
         },
-      }); 
+      });
 
       if (userLeaveData)
         return res.status(200).json({
@@ -80,6 +84,11 @@ export const userRegister = async (req: Request, res: Response) => {
           message: ResponseMessages.USER.REGISTER,
         });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.USER.REGISTER,
+    });
   } catch (error: any) {
     if (error.isJoi) {
       return res.status(404).json({
@@ -123,7 +132,6 @@ export const userLogin = async (req: Request, res: Response) => {
     };
 
     const token = createToken(user.id, user.name, user.email, user.roleId);
-    const date = new Date();
 
     res.cookie("user", token, {
       secure: true,
@@ -337,3 +345,135 @@ export const resetPassword = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getUserDetails = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user;
+
+    if (!id) throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+
+    const userDetails = await prisma.user.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        gender: true,
+        department: true,
+        class: true,
+        image: true,
+        gr_number: true,
+        phone: true,
+        roleId: true,
+        address: true,
+      },
+    });
+
+    if (!userDetails) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.USER.FETCHED,
+      data: userDetails,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
+export const updateUserDetails = async (req: Request, res: Response) => {
+  try {
+    await userUpdate.validateAsync(req.body);
+
+    const {
+      name,
+      email,
+      gender,
+      department,
+      className,
+      image,
+      gr_number,
+      phone,
+      roleId,
+      address,
+    } = req.body;
+
+    const { id } = req.user;
+
+    const updateUser = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        email,
+        gender,
+        department,
+        class: className,
+        image,
+        gr_number,
+        phone,
+        roleId,
+        address,
+      },
+    });
+
+    if (!updateUser) throw new Error(ResponseMessages.ERROR.NOT_FOUND);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.USER.UPDATED,
+      user: updateUser,
+    });
+  } catch (error: any) {
+    if (error.isJoi)
+      return res.json({
+        success: false,
+        message: ResponseMessages.ERROR.VALIDATION_ERROR,
+        error: error.details,
+      });
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+
+export const updateUserImage = async (req: Request, res: Response) => {
+  try {
+    console.log(req.file);
+    console.log(req.body);
+    const { id } = req.user;
+
+    const updateImage = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        image: `Uploads/${req.file?.filename}`,
+      },
+    });
+
+    if (!updateImage) throw new Error(ResponseMessages.ERROR.WENT_WRONG);
+
+    return res.status(200).json({
+      success: true,
+      message: ResponseMessages.USER.UPDATED,
+      user: updateImage,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: ResponseMessages.ERROR.WENT_WRONG,
+      error: error.message,
+    });
+  }
+};
+  

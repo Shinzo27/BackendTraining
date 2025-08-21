@@ -10,6 +10,22 @@ export const registerInitialValue = {
   className: "",
 };
 
+export const leaveFormInitData = {
+  startDate: "",
+  endDate: "",
+  requestToId: "",
+  leaveType: "",
+  reason: "",
+};
+
+export const addStaticDataInit = {
+  department: "",
+  className: "",
+  academicYear: "",
+  totalLeave: 0,
+  totalWorkingDays: 0,
+};
+
 export interface registerStudent {
   name: string;
   email: string;
@@ -176,4 +192,23 @@ export interface IPendingLeaves {
     name: string;
   };
   reason: string;
+}
+
+export interface ILeaveFormFaculty {
+  id: string;
+  name: string;
+}
+
+export interface IUserDetails {
+  id: string;
+  name: string;
+  email: string;
+  gender: string;
+  department: string;
+  class: string;
+  image: string;
+  gr_number: string;
+  phone: string;
+  roleId: number;
+  address: string;
 }

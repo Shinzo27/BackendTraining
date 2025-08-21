@@ -10,7 +10,7 @@ const HodFacultyLeaveApprovalList = ({
   setFacultyLeaves: Dispatch<SetStateAction<[] | Leave[]>>;
 }) => {
   return (
-    <div className="bg-neutral-800 p-10 rounded-2xl lg:min-w-[800px] min-w-[200px] flex items-center justify-center flex-col">
+    <div className="bg-neutral-800 p-10 rounded-2xl lg:min-w-[800px] min-w-[200px] flex items-center justify-start flex-col min-h-[500px]">
       <div className="w-full flex items-start justify-center     flex-col">
         <h1 className="font-bold text-2xl">Facaulty Leave Approval</h1>
         <h1 className="font-light text-sm">All requested leave list</h1>

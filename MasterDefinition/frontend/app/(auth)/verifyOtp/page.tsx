@@ -26,7 +26,7 @@ const Page = () => {
         <Formik
           initialValues={{ email: "", otp: "" }}
           validationSchema={verifyOtpValidation}
-          onSubmit={async (values) => {
+          onSubmit={async (values, { resetForm }) => {
             try {
               const { data } = await api.post(
                 "/users/verifyOtp",
@@ -37,6 +37,7 @@ const Page = () => {
               if (data.success) {
                 toast.success(data.message);
                 router.push("/resetPassword");
+                resetForm();
               }
             } catch (error: any) {
               toast.error(error.response.data.error);

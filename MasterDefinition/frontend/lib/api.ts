@@ -41,7 +41,7 @@ export const leaveRequestConfirm = async (
     const { data } = await api.put(`/faculty/approveLeave/${id}`, { status });
     if (data.success) return data;
   } catch (error: any) {
-    return error.message;
+    throw new Error(error.response.data.error);
   }
 };
 
@@ -58,7 +58,7 @@ export const facultyLeaveApply = async (values: leaveValidation) => {
 
     if (data.success) return data;
   } catch (error: any) {
-    return error.message;
+    throw new Error(error.response.data.error);
   }
 };
 

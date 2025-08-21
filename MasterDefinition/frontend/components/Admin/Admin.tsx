@@ -41,7 +41,7 @@ const Admin = () => {
   return isLoading ? (
     <Loader />
   ) : (
-    <div className="mb-10 ">
+    <div className="mb-20 ">
       <div className="m-5">
         <h1 className="font-bold text-2xl">Admin Dashboard</h1>
         <p>Welcome back, {session?.user.name}</p>
@@ -74,7 +74,7 @@ const Admin = () => {
             >
               Manage Static Data
             </TabsTrigger>
-                        <TabsTrigger
+            <TabsTrigger
               className="data-[state=active]:bg-neutral-900 data-[state=active]:text-white"
               value="highestLeave"
             >

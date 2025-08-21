@@ -31,7 +31,7 @@ export const checkRegisterUser = async (
 ) => {
   try {
     const { roleId, email } = req.body;
-    const user = req.user;  
+    const user = req.user;
 
     const checkIfExists = await checkIfUserExists(email);
     if (checkIfExists)
@@ -76,39 +76,26 @@ export const checkAdminOrFacultyLoggedIn = (
   role: "admin" | "faculty" | "both"
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const userRole = req.user?.role;
-
-    if (role === "admin") {
-      if (userRole === 1) {
-        return next();
-      } else {
-        return res.json({
-          success: false,
-          message: ResponseMessages.ERROR.UNAUTHORIZE,
-        });
-      }
-    } else if (role === "faculty") {
-      if (userRole === 2 || userRole === 3) {
-        return next();
-      } else {
-        return res.json({
-          success: false,
-          message: ResponseMessages.ERROR.UNAUTHORIZE,
-        });
-      }
-    } else if (role === "both") {
-      if (userRole === 1 || userRole === 2 || userRole === 3) {
-        return next();
-      } else {
-        return res.json({
-          success: false,
-          message: ResponseMessages.ERROR.UNAUTHORIZE,
-        });
-      }
-    } else {
+    try {
+      const userRole = req.user?.role;
+      if (role === "admin") {
+        if (userRole === 1) {
+          return next();
+        } else throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+      } else if (role === "faculty") {
+        if (userRole === 2 || userRole === 3) {
+          return next();
+        } else throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+      } else if (role === "both") {
+        if (userRole === 1 || userRole === 2 || userRole === 3) {
+          return next();
+        } else throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+      } else throw new Error(ResponseMessages.ERROR.UNAUTHORIZE);
+    } catch (error: any) {
       return res.json({
         success: false,
-        message: ResponseMessages.ERROR.UNAUTHORIZE,
+        message: ResponseMessages.ERROR.WENT_WRONG,
+        error: error.message,
       });
     }
   };

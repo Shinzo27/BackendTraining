@@ -26,7 +26,7 @@ const Page = () => {
         <Formik
           initialValues={{ password: "", confirmPassword: "" }}
           validationSchema={resetPasswordValidation}
-          onSubmit={async (values) => {
+          onSubmit={async (values, { resetForm }) => {
             try {
               if (values.password != values.confirmPassword)
                 return toast.error("Password didn't match!");
@@ -38,6 +38,7 @@ const Page = () => {
               if (data.success) {
                 toast.success(data.message);
                 router.push("/login");
+                resetForm();
               }
             } catch (error: any) {
               toast.error(error.response.data.error);

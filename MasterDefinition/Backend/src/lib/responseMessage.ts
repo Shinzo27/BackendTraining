@@ -7,6 +7,8 @@ export const ResponseMessages = {
     OTP_VERIFIED: "Otp verified successfully!",
     PASSWORD_RESET: "Password reset successfully!",
     DELETED: "User Deleted!",
+    FETCHED: "User details fetched!",
+    UPDATED: "User details updated!",
   },
   ROLE: {
     CREATED: "Role created!",
@@ -23,6 +25,8 @@ export const ResponseMessages = {
     REQUESTED: "Leave request applied!",
     FETCHED: "Leave request fetched!",
     UPDATED: "Leave status updated!",
+    APPROVED: "Leave Approved!",
+    REJECTED: "Leave Rejected!",
   },
   ADMIN: {
     LEAVELIST: "Leave list fetched!",

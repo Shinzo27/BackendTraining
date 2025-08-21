@@ -28,7 +28,7 @@ const Page = () => {
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={loginValidations}
-          onSubmit={async (values) => {
+          onSubmit={async (values, { resetForm }) => {
             try {
               const signin = await login(
                 values.email.trim(),
@@ -46,6 +46,7 @@ const Page = () => {
                 if (authSignin?.ok) {
                   router.push("/dashboard");
                   toast.success(signin.message);
+                  resetForm();
                 }
               }
             } catch (error: any) {
@@ -89,7 +90,7 @@ const Page = () => {
                 placeholder="Enter your password"
               />
               {errors.password && touched.password && errors.password}
-              <Button className="px-7 py-6 bg-neutral-950 font-bold text-lg">
+              <Button className="px-7 py-6 bg-neutral-950 font-bold text-lg cursor-pointer">
                 Login
               </Button>
             </form>

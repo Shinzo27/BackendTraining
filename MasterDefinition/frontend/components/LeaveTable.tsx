@@ -16,7 +16,7 @@ const LeaveTable = ({
   title: string;
 }) => {
   return (
-    <div className="flex flex-col items-center justify-start bg-neutral-900 p-10 rounded-lg min-h-[260px]">
+    <div className="flex flex-col items-center justify-start bg-neutral-900 p-10 rounded-lg min-h-[260px] min-w-[550px]">
       <p className="font-bold text-xl">{title}</p>
       {data?.length > 0 ? (
         <Table className="">

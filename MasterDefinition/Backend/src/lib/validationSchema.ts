@@ -60,3 +60,17 @@ export const blogSchema = Joi.object({
   content: Joi.string().required(),
   authorId: Joi.string().required(),
 });
+
+export const userUpdate = Joi.object({
+  id: Joi.string().required(),
+  name: Joi.string().required(),
+  email: Joi.string().required(),
+  gender: Joi.string().required(),
+  department: Joi.string(),
+  className: Joi.string(),
+  image: Joi.string().required(),
+  gr_number: Joi.string(),
+  phone: Joi.string().required(),
+  roleId: Joi.number().integer().required(),
+  address: Joi.string().required(),
+});

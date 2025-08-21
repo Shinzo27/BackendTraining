@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
-export default async function AddUserLayout({
+export default async function RegisterLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -12,5 +12,5 @@ export default async function AddUserLayout({
   if (session?.user) {
     return redirect("/dashboard");
   }
-  return <div className="min-h-screen">{children}</div>;
+  return <div className="">{children}</div>;
 }
