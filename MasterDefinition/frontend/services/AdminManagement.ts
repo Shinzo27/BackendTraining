@@ -47,6 +47,7 @@ export const addStaticData = async (staticData: IAddStaticData) => {
     });
     if (data.success) return data;
   } catch (error: any) {
+    console.log(error);
     toast.error(error.message);
   }
 };
