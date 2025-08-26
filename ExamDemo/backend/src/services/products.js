@@ -66,7 +66,6 @@ export const getProductByIdService = async (id) => {
 };
 
 export const updateStockService = async (productId, stock, type) => {
-  console.log(productId);
   const product = await prisma.product.findFirst({
     where: {
       id: Number(productId),

@@ -27,6 +27,8 @@ export const getOrderDetails = async (id) => {
             product: {
               select: {
                 name: true,
+                price: true,
+                image: true,
               },
             },
             quantity: true,
@@ -237,7 +239,6 @@ export const decreaseQuantity = async (cartItems) => {
     if (!product) throw new Error("Product not found!");
 
     const updatedStock = product.stock - items.quantity;
-    console.log(updatedStock);
     await prisma.product
       .update({
         where: {

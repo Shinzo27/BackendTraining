@@ -14,6 +14,9 @@ const Navbar = () => {
         <div className="font-semibold text-lg">
           <Link href={"/cart"}>Cart</Link>
         </div>
+        <div className="font-semibold text-lg">
+          <Link href={"/orders"}>Orders</Link>
+        </div>
       </div>
     </div>
   );

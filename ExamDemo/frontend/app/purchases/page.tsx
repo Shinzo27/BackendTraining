@@ -11,14 +11,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import axios from "axios";
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const Page = () => {
   const [products, setProducts] = useState([]);
-  
-  
+
   useEffect(() => {
     async function getProducts() {
       try {
@@ -30,6 +30,20 @@ const Page = () => {
     }
     getProducts();
   }, []);
+
+  const handleDeleteProduct = async (id: number) => {
+    try {
+      const { data } = await axios.delete(
+        `http://localhost:8000/api/products/${id}`
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setProducts(data.products);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.error);
+    }
+  };
   return (
     <div className="flex items-center justify-center gap-10 flex-col">
       <div>
@@ -52,8 +66,13 @@ const Page = () => {
                 <TableHead className="w-[200px]">Description</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Stock</TableHead>
-                <TableHead>Add Purchase</TableHead>
-                <TableHead>Edit Product</TableHead>
+                <TableHead className="w-[150px] text-center">
+                  Add Purchase
+                </TableHead>
+                <TableHead className="w-[150px] text-center">
+                  Edit Product
+                </TableHead>
+                <TableHead>Delete Product</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -65,18 +84,26 @@ const Page = () => {
                   </TableCell>
                   <TableCell>{product.price}</TableCell>
                   <TableCell>{product.stock}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Button className="cursor-pointer">
                       <Link href={`/addPurchase/${product.id}`}>
                         Add Purchase
                       </Link>
                     </Button>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Button className="cursor-pointer">
                       <Link href={`/editProduct/${product.id}`}>
                         Edit Product
                       </Link>
+                    </Button>
+                  </TableCell>
+                  <TableCell className="cursor-pointer text-center">
+                    <Button
+                      className="cursor-pointer"
+                      onClick={() => handleDeleteProduct(product.id)}
+                    >
+                      <Trash2 className="text-white" />
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -46,27 +46,29 @@ const Page = () => {
             <div className="font-bold text-lg">Remove</div>
           </div>
         </div>
-        {
-            cartItems.length > 0 ? (
-                <>
-        <div className="mt-5 flex flex-col items-center justify-center gap-10">
-          {cartItems.map((item, index) => (
-              <CartItem key={index} item={item} />
-            ))}
-        </div>
-        <div className="flex items-center justify-end pr-5 mt-5">
-          <h1 className="font-bold text-2xl">Total Amount : $ {totalAmount}</h1>
-        </div>
-        <div className="flex items-center justify-end pr-5 mt-5">
-          <Button>
-            <Link href={"/checkout"}>Checkout</Link>
-          </Button>
-        </div>
-            </>
-            ) : (
-                <h1 className="font-bold text-3xl text-center mt-5">No Cart Items Found!</h1>
-            )
-        }   
+        {cartItems.length > 0 ? (
+          <>
+            <div className="mt-5 flex flex-col items-center justify-center gap-10">
+              {cartItems.map((item, index) => (
+                <CartItem key={index} item={item} setCartItems={setCartItems} />
+              ))}
+            </div>
+            <div className="flex items-center justify-end pr-5 mt-5">
+              <h1 className="font-bold text-2xl">
+                Total Amount : $ {totalAmount}
+              </h1>
+            </div>
+            <div className="flex items-center justify-end pr-5 mt-5">
+              <Button>
+                <Link href={"/checkout"}>Checkout</Link>
+              </Button>
+            </div>
+          </>
+        ) : (
+          <h1 className="font-bold text-3xl text-center mt-5">
+            No Cart Items Found!
+          </h1>
+        )}
       </div>
     </div>
   );

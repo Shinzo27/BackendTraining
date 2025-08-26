@@ -44,7 +44,7 @@ model SaleProductDetails {
   productId Int
   quantity  Int
   order     SalesData @relation(name: "saleId", fields: [orderId], references: [id])
-  product   Product   @relation(name: "saleProduct", fields: [productId], references: [id])
+  product   Product   @relation(name: "saleProduct", fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Cart {
@@ -53,5 +53,5 @@ model Cart {
   productId  Int
   quantity   Int
   totalPrice Float
-  product    Product @relation(name: "cartProduct", fields: [productId], references: [id])
+  product    Product @relation(name: "cartProduct", fields: [productId], references: [id], onDelete: Cascade)
 }

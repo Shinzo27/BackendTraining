@@ -19,3 +19,20 @@ export interface IProductDetails {
   image: string;
   stock: number;
 }
+
+export interface IOrderDetails {
+  address: string;
+  city: string;
+  id: number;
+  pincode: number;
+  saleProductDetails: {
+    product: {
+      name: string;
+      price: number;
+      image: string;
+    };
+    quantity: number;
+  }[];
+  total: number;
+  userId: number;
+}

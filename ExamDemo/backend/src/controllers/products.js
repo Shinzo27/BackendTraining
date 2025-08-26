@@ -1,6 +1,5 @@
 import {
   addProductValidation,
-  updateProductValidation,
   updateStockValidation,
 } from "../lib/valdiations.js";
 import {
@@ -70,9 +69,12 @@ export const deleteProduct = async (req, res) => {
 
     if (!productDelete) throw new Error("Product Not Found!");
 
+    const products = await getProductsService();
+
     return res.json({
       success: true,
       message: "Product Deleted!",
+      products: products,
     });
   } catch (error) {
     return res.status(500).json({

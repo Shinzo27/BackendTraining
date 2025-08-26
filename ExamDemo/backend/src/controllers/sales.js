@@ -77,11 +77,14 @@ export const removeItemFromCart = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleteItem = await deleteCartItem(id);
+    await deleteCartItem(id);
+
+    const getItems = await getCartDetailsService();
 
     return res.json({
       success: true,
       message: "Item Removed!",
+      items: getItems,
     });
   } catch (error) {
     return res.status(500).json({
@@ -95,7 +98,6 @@ export const removeItemFromCart = async (req, res) => {
 export const updateItemFromCart = async (req, res) => {
   try {
     const { id, type } = req.params;
-    console.log(type != "Increase" && type != "Decrease");
 
     if (type != "Increase" && type != "Decrease") {
       throw new Error("Invalid Type!");

@@ -4,10 +4,16 @@ import { Button } from "./ui/button";
 import { CartType } from "@/lib/validations";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Trash } from "lucide-react";
 
-const CartItem = ({ item }: { item: CartType }) => {
+const CartItem = ({
+  item,
+  setCartItems,
+}: {
+  item: CartType;
+  setCartItems: Dispatch<SetStateAction<never[]>>;
+}) => {
   const [quantity, setQuantity] = useState(item.quantity);
 
   const handleUpdateQuantity = async (type: string) => {
@@ -20,6 +26,20 @@ const CartItem = ({ item }: { item: CartType }) => {
         setQuantity(quantity + 1);
       } else {
         setQuantity(quantity - 1);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.error);
+    }
+  };
+
+  const handleDeleteItem = async () => {
+    try {
+      const { data } = await axios.delete(
+        `http://localhost:8000/api/sales/cart/${item.id}`
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setCartItems(data.items);
       }
     } catch (error: any) {
       toast.error(error.response.data.error);
@@ -63,8 +83,8 @@ const CartItem = ({ item }: { item: CartType }) => {
           $ {item.totalPrice}
         </div>
         <div className="font-bold">
-        <Button className="cursor-pointer">
-            <Trash  />
+          <Button className="cursor-pointer" onClick={handleDeleteItem}>
+            <Trash />
           </Button>
         </div>
       </div>
