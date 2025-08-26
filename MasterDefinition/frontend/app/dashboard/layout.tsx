@@ -1,0 +1,16 @@
+import { NEXT_AUTH } from "@/services/authServices";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import React from "react";
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getServerSession(NEXT_AUTH);
+  if (!session?.user) {
+    return redirect("/");
+  }
+  return <div className="min-h-screen">{children}</div>;
+}

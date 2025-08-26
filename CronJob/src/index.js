@@ -23,7 +23,7 @@ const __dirname = dirname(__filename);
 const emailTemplateSource = await fs.readFile(
   path.join(__dirname, "./mail.hbs"),
   "utf8"
-);
+);  
 
 const template = handlebars.compile(emailTemplateSource);
 

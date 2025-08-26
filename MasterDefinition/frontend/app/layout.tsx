@@ -1,0 +1,31 @@
+import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import { Toaster } from "react-hot-toast";
+import { Providers } from "@/lib/Providers";
+
+export const metadata: Metadata = {
+  title: "LMS",
+  description: "Leave Management System",
+};
+
+const montserrat = Montserrat({ subsets: ["latin"] });
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${montserrat.className} bg-neutral-950 text-white`}>
+        <Providers>
+          <Navbar />
+          <Toaster position="top-center" />
+          {children}
+        </Providers>
+      </body>
+    </html>
+  );
+}
